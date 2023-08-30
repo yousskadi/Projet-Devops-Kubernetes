@@ -12,7 +12,10 @@ user = APIRouter()
 key = Fernet.generate_key()
 f = Fernet(key)
 
-
+@user.get("/")
+def root():
+    return {"message": "Congratulations ! It works ! You should try to take a look at the pgadmin panel on port 8080"}
+    
 @user.get(
     "/users",
     tags=["users"],
