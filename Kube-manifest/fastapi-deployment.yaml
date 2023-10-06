@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fastapi
+  name: fastapi
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+        - image: fastapi
+          name: fastapi
+          ports:
+            - containerPort: 5000
+              hostPort: 80
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
