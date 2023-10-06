@@ -17,7 +17,7 @@ spec:
         app: fastapi
     spec:
       containers:
-        - image: kubernetes-devops-project_fastapi:latest 
+        - image: "$DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG"
           name: fastapi
           ports:
             - containerPort: 5000
