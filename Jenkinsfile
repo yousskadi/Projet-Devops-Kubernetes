@@ -105,7 +105,7 @@ stages {
         post { // send email when the job has failed
             always {
                 script {
-                    slackNotifier currentBuild.result
+                    slackSend botUser: true, color: 'good', message: 'Successful completion of ${env.JOB_NAME}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
                 }
             }
             
