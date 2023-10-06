@@ -17,11 +17,10 @@ spec:
         app: fastapi
     spec:
       containers:
-        - image: fastapi
+        - image: kubernetes-devops-project_fastapi:latest 
           name: fastapi
           ports:
             - containerPort: 5000
-              hostPort: 80
               protocol: TCP
           resources: {}
       restartPolicy: Always
