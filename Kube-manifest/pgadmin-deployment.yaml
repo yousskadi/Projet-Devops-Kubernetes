@@ -24,6 +24,6 @@ spec:
           image: dpage/pgadmin4
           name: pgadmin
           ports:
-            - containerPort: 8080
+            - containerPort: 80
               protocol: TCP
       restartPolicy: Always
