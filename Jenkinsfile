@@ -66,8 +66,8 @@ stages {
                     steps {
                         script {
                         sh '''
-                        cd kubernetes-manifest
-                        kubectl apply -k environments/dev
+            
+                        kubectl apply -f Kube-manifest/
                         '''
                         }
                     }
@@ -88,8 +88,7 @@ stages {
 
                         script {
                         sh '''
-                        cd kubernetes-manifest
-                        kubectl apply -k environments/prod
+                         kubectl apply -f Kube-manifest/
                         '''
                         }
                     }
