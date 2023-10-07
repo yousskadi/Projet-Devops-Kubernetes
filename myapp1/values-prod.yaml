@@ -1,0 +1,6 @@
+appName: pgadmin-prod
+
+fastapiName: fastapi-prod
+
+namespace: prod
+
