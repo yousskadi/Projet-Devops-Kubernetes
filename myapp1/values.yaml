@@ -2,6 +2,8 @@ appName: pgadmin-default
 
 fastapiName: fastapi
 
+fastapiNodeport: fastapinodeport
+
 namespace: default
 
 image:

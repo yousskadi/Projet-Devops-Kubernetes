@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: {{ .Values.fastapiName }}
-  name: {{ .Values.fastapiName }}
+  name: {{ .Values.fastapiNodeport }}
 spec:
   ports:
   - port: 5000
