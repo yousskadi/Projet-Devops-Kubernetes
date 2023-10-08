@@ -66,7 +66,7 @@ stages {
                     steps {
                         script {
                         sh '''
-                        cd Projet-Kubernetes-devops/kubernetes-devops-project      
+                        
                         helm upgrade myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
                         '''
                         }
@@ -88,7 +88,7 @@ stages {
 
                         script {
                         sh '''
-                         cd Projet-Kubernetes-devops/kubernetes-devops-project      
+                               
                          helm upgrade myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod
                         '''
                         }

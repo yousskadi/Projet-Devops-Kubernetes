@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: fastapi
-  name: fastapi
+  name: fastapinodeport
 spec:
   ports:
   - port: 5000
