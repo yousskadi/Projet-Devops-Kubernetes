@@ -60,7 +60,7 @@ stages {
         stage('Deploiement en dev'){
                 environment
                 {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS")
                 }
                     steps {
@@ -77,7 +77,7 @@ stages {
         stage('Deploiement en prod'){
                 environment
                 {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 }
                     steps {
                     // Create an Approval Button with a timeout of 15minutes.
