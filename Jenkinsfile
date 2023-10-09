@@ -77,7 +77,7 @@ stages {
         stage('Deploiement en prod'){
                 environment
                 {
-                KUBECONFIG = credentials("eks-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 }
                     steps {
                     // Create an Approval Button with a timeout of 15minutes.
