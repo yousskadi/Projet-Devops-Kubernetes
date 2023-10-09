@@ -62,10 +62,11 @@ stages {
                 {
                 KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS")
-                AWS_CREDENTIALS = credentials("user-AWS")
+                AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+                AWS_DEFAULT_REGION = "eu-west-3"
                 }
                     steps {
-                        withAWS(credentials: 'user-AWS', region: 'eu-west-3'){
                         script {
                         sh '''
                         
@@ -73,7 +74,7 @@ stages {
                         '''
                         }
                     }
-                    }
+                    
 
                 }
 
@@ -81,7 +82,9 @@ stages {
                 environment
                 {
                 KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-                AWS_CREDENTIALS = credentials("user-AWS")
+                AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+                AWS_DEFAULT_REGION = "eu-west-3"
                 }
                     steps {
                     // Create an Approval Button with a timeout of 15minutes.
