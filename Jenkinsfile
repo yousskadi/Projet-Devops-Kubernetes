@@ -65,12 +65,14 @@ stages {
                 AWS_CREDENTIALS = credentials("user-AWS")
                 }
                     steps {
+                        withAWS(credentials: 'user-AWS', region: 'eu-west-3'){
                         script {
                         sh '''
                         
                         helm upgrade myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
                         '''
                         }
+                    }
                     }
 
                 }
