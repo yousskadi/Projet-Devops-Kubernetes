@@ -62,6 +62,7 @@ stages {
                 {
                 KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+                AWS_CREDENTIALS = credentials("user-AWS")
                 }
                     steps {
                         script {
@@ -78,6 +79,7 @@ stages {
                 environment
                 {
                 KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+                AWS_CREDENTIALS = credentials("user-AWS")
                 }
                     steps {
                     // Create an Approval Button with a timeout of 15minutes.
