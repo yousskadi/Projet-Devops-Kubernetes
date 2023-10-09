@@ -70,7 +70,7 @@ stages {
                         script {
                         sh '''
                         
-                        helm upgrade myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
+                        helm install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
                         '''
                         }
                     }
@@ -96,7 +96,7 @@ stages {
                         script {
                         sh '''
                                
-                         helm upgrade myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod
+                         helm install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod
                         '''
                         }
                     }
