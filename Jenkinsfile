@@ -22,7 +22,7 @@ stages {
                     sh '''
                     echo "Cleaning existing container if exist"
                     docker ps -a | grep -i fastapi && docker rm -f fastapi
-                    docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                    docker run -d -p 80:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
                     sleep 10
                     '''
                     }
@@ -33,7 +33,7 @@ stages {
             steps {
                     script {
                     sh '''
-                    curl -X GET -i http://0.0.0.0:5000
+                    curl -X GET -i http://0.0.0.0:80
                     '''
                     }
             }
