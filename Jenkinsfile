@@ -33,7 +33,12 @@ stages {
             steps {
                     script {
                     sh '''
-                    curl -X GET -i http://0.0.0.0:5000
+                    curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' http://63.33.235.217:80
+                    if curl -X 'GET' -H 'accept: application/json' http://63.33.235.217:80/users | grep -qF "toto"; then
+                        echo "La chaîne 'titi' a été trouvée dans la réponse."
+                    else
+                        echo "La chaîne 'titi' n'a pas été trouvée dans la réponse."
+                    fi  
                     '''
                     }
             }
