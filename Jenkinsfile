@@ -113,7 +113,7 @@ stages {
         }
     }
         post { // send email when the job has failed
-            successful {
+            success {
                 script {
                     slackSend botUser: true, color: 'good', message: 'Successful : Build Started: ${env.JOB_NAME} ${env.BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
                 }
