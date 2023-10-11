@@ -69,6 +69,7 @@ stages {
                     steps {
                         script {
                         sh '''
+                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                         kubectl create namespace dev
                         helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
                         '''
@@ -95,6 +96,7 @@ stages {
 
                         script {
                         sh '''
+                         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                          kubectl create namespace prod      
                          helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod
                         '''
@@ -111,13 +113,17 @@ stages {
         }
     }
         post { // send email when the job has failed
-            always {
+            successful {
                 script {
-                    slackSend botUser: true, color: 'good', message: 'Successful completion of ${env.JOB_NAME}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+                    slackSend botUser: true, color: 'good', message: 'Successful : Build Started: ${env.JOB_NAME} ${env.BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
                 }
             }
             
-            
+            failure {
+                script {
+                    slackSend botUser: true, color: 'danger', message: 'Failure :Build Started: ${env.JOB_NAME} ${env.BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+                }
+            }
             // ..
             /*
             failure {
