@@ -8,4 +8,4 @@ namespace: default
 
 image:
   name: ykadi/datascientestapi
-  tag: "v.5.0"
+  tag: ""
