@@ -6,7 +6,7 @@ metadata:
   name: postgres-pv-volume
   namespace: {{ .Values.namespace }}
 spec:
-  storageClassName: manual
+  storageClassName: "gp2"
   capacity:
     storage: 100Mi
   accessModes:
