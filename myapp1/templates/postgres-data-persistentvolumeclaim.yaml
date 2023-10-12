@@ -3,12 +3,12 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     app: postgres-data
-  name: postgres-data
+  name: postgres-pv-claim
   namespace: {{ .Values.namespace }}
 spec:
+  storageClassName: manual
   accessModes:
-    - ReadWriteOnce
-  storageClassName: gp2  
+    - ReadWriteOnce  
   resources:
     requests:
       storage: 100Mi

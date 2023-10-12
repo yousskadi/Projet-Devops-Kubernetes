@@ -37,12 +37,9 @@ spec:
           resources: {}
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: postgres-data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 100Mi
+              name: postgres-db
+  volumes:
+    - name: postgres-db
+      persistentVolumeClaim:
+          claimName: postgres-pv-claim
+      
