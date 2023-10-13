@@ -1,14 +1,3 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgresql-fastapi-userpass
-  namespace: dev
-type: Opaque
-data:
-  password: UHJvamVjdERldm9wczIwMjMh
-
----
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
