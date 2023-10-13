@@ -4,11 +4,10 @@ metadata:
   labels:
     app: postgres-data
   name: postgres-pv-volume
-  namespace: {{ .Values.namespace }}
 spec:
   storageClassName: "gp2"
   capacity:
-    storage: 1Gi
+    storage: 100Mi
   accessModes:
     - ReadWriteOnce
   hostPath:
