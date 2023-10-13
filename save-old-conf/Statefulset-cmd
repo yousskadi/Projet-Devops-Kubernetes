@@ -1,3 +1,5 @@
+cat <<EOF | kubectl apply -f -
+
 apiVersion: v1
 kind: Secret
 metadata:
@@ -6,14 +8,12 @@ metadata:
 type: Opaque
 data:
   password: UHJvamVjdERldm9wczIwMjMh
-
 ---
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: db
-  namespace: {{ .Values.namespace }}
+  namespace: dev
 spec:
   replicas: 1
   serviceName: db
@@ -50,19 +50,17 @@ spec:
       volumes:
           - name: postgres-db
             persistentVolumeClaim:
-              claimName: {{ .Values.pvcName }}
+              claimName: pvc-db
           
 
+EOF
 
 
-  # volumeClaimTemplates:
-  #   - metadata:
-  #       name: postgres-db
-  #     spec:
-  #       accessModes: [ "ReadWriteOnce" ]
-  #       storageClassName: manual
-  #       resources:
-  #         requests:
-  #           storage: 100Mi
-
-      
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-fastapi-userpass
+  namespace :dev
+type: Opaque
+data:
+  password: UHJvamVjdERldm9wczIwMjMh
