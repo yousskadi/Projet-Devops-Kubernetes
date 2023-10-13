@@ -42,7 +42,7 @@ spec:
               name: postgres-db
       volumes:
           - name: postgres-db
-           persistentVolumeClaim:
+            persistentVolumeClaim:
               claimName: {{ .Values.pvcName }}
           
 
