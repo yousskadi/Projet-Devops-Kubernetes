@@ -2,10 +2,10 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: db
+    app: postgres-data
   name: postgres-pv-volume
 spec:
-  storageClassName: manual
+  storageClassName: "gp2"
   capacity:
     storage: 100Mi
   accessModes:
