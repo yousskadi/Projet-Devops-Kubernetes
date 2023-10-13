@@ -4,3 +4,4 @@ fastapiName: fastapi-dev
 
 namespace: dev
 
+pvcName: postgres-pv-claim-dev
