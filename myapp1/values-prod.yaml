@@ -5,3 +5,5 @@ fastapiName: fastapi-prod
 namespace: prod
 
 pvcName: postgres-pv-claim-prod
+
+storageClassName: stclassname-prod
