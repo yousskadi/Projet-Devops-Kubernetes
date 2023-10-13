@@ -6,7 +6,6 @@ provisioner: kubernetes.io/aws-ebs # Amazon EBS CSI driver
 parameters:
   type: gp2
   encrypted: 'true' # EBS volumes will always be encrypted by default
-volumeBindingMode: WaitForFirstConsumer # EBS volumes are AZ specific
+volumeBindingMode: WaitForFirstConsumer 
 reclaimPolicy: Delete
-mountOptions:
-- debug
+
