@@ -1,4 +1,4 @@
-- Test acceptance: ajout d'un test cohérent avec le build
+- Test acceptance: ajout d'un test cohérent avec le build : fait par faycal
 - Ajout stage "Deploiement stagging"
             définir les tests
 - Mettre en place des variables environnment
