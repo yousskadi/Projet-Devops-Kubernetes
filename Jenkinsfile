@@ -7,7 +7,6 @@ DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build 
 agent any // Jenkins will be able to select all available agents
 
 stages {
-
         // get rid of unused docker data and volumes and network and so on
         // clean kubernetes cluster
         stage('Clean stage') {
@@ -28,7 +27,7 @@ stages {
             }
         }
 
-        stage(' Docker run') { // run container from our builded image
+        stage('Docker run') { // run container from our builded image
                 steps {
                     script {
                     sh '''
@@ -41,7 +40,7 @@ stages {
                 }
         }
 
-        stage('Test Acceptance') { // we launch the curl command to validate that the container responds to the request
+        stage('Acceptance test') { // we launch the curl command to validate that the container responds to the request
             steps {
                     script {
                     sh '''
