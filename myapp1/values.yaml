@@ -7,5 +7,5 @@ fastapiNodeport: fastapinodeport
 namespace: default
 
 image:
-  name: ykadi/datascientestapi
+  name: vikinghacker/fastapi_kubernetes
   tag: v.5.0
