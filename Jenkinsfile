@@ -71,6 +71,14 @@ stages {
             }
         }
 
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh "kubectl apply -f kubernetes-manifests/"
+                }
+            }
+        }
+
         stage('Dev deployment') {
             environment {
                 KUBECONFIG = credentials("config")
