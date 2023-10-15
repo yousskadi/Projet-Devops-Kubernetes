@@ -8,3 +8,4 @@ namespace: default
 
 image:
   name: vikinghacker/fastapi_kubernetes
+  tag: ""

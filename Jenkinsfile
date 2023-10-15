@@ -80,33 +80,25 @@ stages {
             }
         }
 
-        stage('Dev deployment') {
-            environment {
+        stage('Deploiement en dev'){
+                environment
+                {
                 KUBECONFIG = credentials("config")
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS")
-            }
-            steps {
-                script {
-                    // install or upgrade the release
-                    // upgradeStatus contains the string "DEPLOYED" if deployment succeeded
-                    def upgradeStatus = helm(
-                        name: 'myapp-release-dev',
-                        chart: 'myapp1/',
-                        values: ['myapp1/values.yaml', 'myapp1/values-dev.yaml'],
-                        namespace: 'dev',
-                        wait: true,
-                        reuseValues: true
-                    )
-
-                    // check if everything is alright after deployment
-                    if (upgradeStatus == 'DEPLOYED') {
-                        echo 'Helm release upgraded successfully.'
-                    } else {
-                        echo 'Helm release installed successfully.'
-                    }
                 }
-            }
-        }  
+                    steps {
+                        script {
+                        sh '''
+                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                        helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
+                        '''
+                        }
+                    }
+                    
+
+                }
+
+          
     }
 }   
 
