@@ -7,121 +7,124 @@ pipeline {
     agent any // Jenkins will be able to select all available agents
 
     stages {
-            // get rid of unused docker data and volumes and network and so on
-            // clean kubernetes cluster
-            stage('Clean stage') {
-                    steps {
-                        sh 'docker system prune -a --volumes -f'
-                        sh 'kubectl delete all --all -n default'
-                    }
-            }
+        // get rid of unused docker data and volumes and network and so on
+        // clean kubernetes cluster
+        stage('Clean stage') {
+                steps {
+                    sh 'docker system prune -a --volumes -f'
+                    sh 'kubectl delete all --all -n default'
+                }
+        }
 
-            stage('Docker Build') {
+        stage('Docker Build') {
+            steps {
+                script {
+                sh '''
+                docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
+                sleep 6
+                '''
+                }
+            }
+        }
+
+        stage('Docker run') { // run container from our builded image
                 steps {
                     script {
                     sh '''
-                    docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
-                    sleep 6
+                    echo "Cleaning existing container if exist"
+                    docker ps -a | grep -i fastapi && docker rm -f fastapi
+                    docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                    sleep 10
                     '''
                     }
                 }
-            }
+        }
 
-            stage('Docker run') { // run container from our builded image
-                    steps {
-                        script {
-                        sh '''
-                        echo "Cleaning existing container if exist"
-                        docker ps -a | grep -i fastapi && docker rm -f fastapi
-                        docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
-                        sleep 10
-                        '''
-                        }
-                    }
-            }
-
-            stage('Acceptance test') { // we launch the curl command to validate that the container responds to the request
-                steps {
-                        script {
-                        sh '''
-                        curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' http://52.30.113.35:80
-                        if curl -X 'GET' -H 'accept: application/json' http://52.30.113.35:80/users | grep -qF "toto"; then
-                            echo "La chaîne 'titi' a été trouvée dans la réponse."
-                        else
-                            echo "La chaîne 'titi' n'a pas été trouvée dans la réponse."
-                        fi  
-                        '''
-                        }
-                }
-
-            }
-
-            stage('Docker Push') { //we pass the built image to our docker hub account
-                environment
-                {
-                    DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
-                }
-
-                steps {
+        stage('Acceptance test') { // we launch the curl command to validate that the container responds to the request
+            steps {
                     script {
                     sh '''
-                    docker login -u $DOCKER_ID -p $DOCKER_PASS
-                    docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                    curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' http://52.30.113.35:80
+                    if curl -X 'GET' -H 'accept: application/json' http://52.30.113.35:80/users | grep -qF "toto"; then
+                        echo "La chaîne 'titi' a été trouvée dans la réponse."
+                    else
+                        echo "La chaîne 'titi' n'a pas été trouvée dans la réponse."
+                    fi  
                     '''
                     }
-                }
             }
 
-            stage('Deploy to Kubernetes') {
-                steps {
-                    script {
-                        sh "kubectl apply -f kubernetes-manifests/"
-                    }
-                }
+        }
+
+        stage('Docker Push') { //we pass the built image to our docker hub account
+            environment
+            {
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
             }
 
-            stage('Dev deployment') {
-                environment {
-                    KUBECONFIG = credentials("config")
-                    DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+            steps {
+                script {
+                sh '''
+                docker login -u $DOCKER_ID -p $DOCKER_PASS
+                docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                '''
                 }
-                steps {
-                    script {
-                        sh '''
-                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-                        '''
+            }
+        }
 
-                        // helm chart values and options
-                        def helmChart = 'myapp1/'
-                        def helmValues = ['myapp1/values.yaml', 'myapp1/values-dev.yaml']
-                        def namespace = 'dev'
-
-                        // check if the release already exists
-                        def releaseExists = sh(
-                            script: "helm list --namespace $namespace | grep myapp-release-dev",
-                            returnStatus: true
-                        ) == 0
-
-                        // install or upgrade the Helm release
-                        def helmCommand = releaseExists ? 'upgrade' : 'install'
-                        def upgradeStatus = helm(
-                            name: 'myapp-release-dev',
-                            chart: helmChart,
-                            values: helmValues,
-                            namespace: namespace,
-                            wait: true,
-                            reuseValues: true,
-                            command: helmCommand
-                        )
-
-                        // check if everything is alright after deployment
-                        if (upgradeStatus == 'DEPLOYED') {
-                            echo 'Helm release upgraded successfully.'
-                        } else {
-                            echo 'Helm release installed successfully.'
-                        }
-                    }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh "kubectl apply -f kubernetes-manifests/"
                 }
+            }
+        }
+
+        stage('Dev deployment') {
+            environment {
+                KUBECONFIG = credentials("config")
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+            }
+        steps {
+            script {
+                sh '''
+                # replace the tag in values.yaml with the DOCKER_TAG
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                '''
+
+                // helm chart values and options
+                def helmChart = 'myapp1/'
+                def helmValues = ['myapp1/values.yaml', 'myapp1/values-dev.yaml']
+                def namespace = 'dev'
+                def releaseName = 'myapp-release-dev'
+                def helmCommand = 'install'
+
+                // check if the release already exists
+                def releaseExists = sh(
+                    script: "helm list -n $namespace | grep $releaseName",
+                    returnStatus: true
+                ) == 0
+
+                if (releaseExists) {
+                    helmCommand = 'upgrade'
+                }
+
+                // helm command with flags
+                def helmFlags = '--wait --reuse-values'
+                def helmCmd = "helm $helmCommand $releaseName $helmChart $helmFlags --namespace $namespace"
+
+                // perform Helm deployment
+                sh helmCmd
+
+                // check the status of the deployment
+                def deploymentStatus = sh(script: "helm list -n $namespace | grep $releaseName | awk '{print $8}'", returnStatus: true).trim()
+
+                if (deploymentStatus == 'DEPLOYED') {
+                    echo 'Helm release upgraded successfully.'
+                } else {
+                    echo 'Helm release installed successfully.'
+                }
+            }
         }
     }
 }   
