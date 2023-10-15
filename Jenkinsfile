@@ -117,7 +117,7 @@ pipeline {
                     sh(helmCmd)
 
                     // check the status of the deployment
-                    def deploymentStatus = sh(script: "helm list -n $namespace | grep $releaseName | awk '{print \\$8}'", returnStatus: true).trim()
+                    def deploymentStatus = sh(script: "helm list -n $namespace | grep $releaseName | awk '{print \$8}'", returnStatus: true).trim()
 
                     if (deploymentStatus == 'DEPLOYED') {
                         echo 'Helm release upgraded successfully!'
