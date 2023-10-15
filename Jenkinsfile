@@ -63,22 +63,33 @@ stages {
 
         }
 
-        stage('Deploiement en dev'){
-                environment
-                {
-                KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        stage('Dev deployment') {
+            environment {
+                KUBECONFIG = credentials("config")
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS")
-                }
-                    steps {
-                        script {
-                        sh '''
-                        
-                        helm upgrade myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
-                        '''
-                        }
-                    }
+            }
+            steps {
+                script {
+                    // install or upgrade the release
+                    // upgradeStatus contains the string "DEPLOYED" if deployment succeeded
+                    def upgradeStatus = helm(
+                        name: 'myapp-release-dev',
+                        chart: 'myapp1/',
+                        values: ['myapp1/values.yaml', 'myapp1/values-dev.yaml'],
+                        namespace: 'dev',
+                        wait: true,
+                        reuseValues: true
+                    )
 
+                    // check if everything is alright after deployment
+                    if (upgradeStatus == 'DEPLOYED') {
+                        echo 'Helm release upgraded successfully.'
+                    } else {
+                        echo 'Helm release installed successfully.'
+                    }
                 }
+            }
+        }
 
         stage('Deploiement en prod'){
                 environment
