@@ -17,7 +17,7 @@ spec:
         app: fastapi
     spec:
       containers:
-        - image: vikinghacker/fastapi_kubernetes:latest
+        - image: vikinghacker/fastapi_kubernetes
           name: fastapi
           ports:
             - containerPort: 5000
