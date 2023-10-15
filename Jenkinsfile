@@ -9,13 +9,15 @@ agent any // Jenkins will be able to select all available agents
 stages {
 
         // get rid of unused docker data and volumes and network and so on
-        stage('Prune Docker data') {
+        // clean kubernetes cluster
+        stage('Clean stage') {
                 steps {
                     sh 'docker system prune -a --volumes -f'
+                    sh 'kubectl delete all --all -n default'
                 }
         }
 
-        stage(' Docker Build') {
+        stage('Docker Build') {
             steps {
                 script {
                 sh '''
