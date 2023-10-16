@@ -72,58 +72,17 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    sh "kubectl apply -f kubernetes-manifests/"
-                }
-            }
-        }
-
-        stage('Dev deployment') {
+        stage('Local Dev deployment') {
             environment {
                 KUBECONFIG = credentials("config")
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS")
             }
             steps {
                 script {
-                    sh '''
-                    # replace the tag in values.yaml with the DOCKER_TAG
-                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-                    '''
-
-                    // helm chart values and options
-                    def helmChart = 'myapp1/'
-                    def helmValues = ['myapp1/values.yaml', 'myapp1/values-dev.yaml']
-                    def namespace = 'dev'
-                    def releaseName = 'myapp-release-dev'
-                    def helmCommand = 'install'
-
-                    // check if the release already exists
-                    def releaseExists = sh(
-                        script: "helm list -n $namespace | grep $releaseName",
-                        returnStatus: true
-                    ) == 0
-
-                    if (releaseExists) {
-                        helmCommand = 'upgrade'
-                    }
-
-                    // helm command with flags
-                    def helmFlags = '--wait --reuse-values'
-                    def helmCmd = "helm $helmCommand $releaseName $helmChart $helmFlags --namespace $namespace"
-
-                    // perform Helm deployment
-                    sh(helmCmd)
-
-                    // check the status of the deployment
-                    def deploymentStatus = sh(script: "helm list -n $namespace | grep $releaseName | awk '{print \$8}'", returnStatus: true).trim()
-
-                    if (deploymentStatus == 'DEPLOYED') {
-                        echo 'Helm release upgraded successfully!'
-                    } else {
-                        echo 'Helm release installed successfully!'
-                    }
+                sh '''
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
+                '''
                 }
             }
         }
