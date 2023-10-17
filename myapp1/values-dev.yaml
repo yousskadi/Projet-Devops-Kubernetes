@@ -7,3 +7,4 @@ namespace: dev
 pvcName: postgres-pv-claim-dev
 
 storageClassName: stclassname-dev
+
