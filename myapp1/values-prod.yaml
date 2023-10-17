@@ -7,3 +7,5 @@ namespace: prod
 pvcName: postgres-pv-claim-prod
 
 storageClassName: stclassname-prod
+
+postgres-pv: false
