@@ -96,7 +96,7 @@ stages {
                         script {
                         sh '''
                          sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                         helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod
+                         helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --set postgres-pv=false
                         '''
                         }
                     }
