@@ -14,7 +14,7 @@ f = Fernet(key)
 
 @user.get("/")
 def root():
-    return {"message": "Congratulations ! It works ! You should try to take a look at the pgadmin panel on port 8080"}
+    return {"message": "Test on root has succeeded"}
     
 @user.get(
     "/users",
