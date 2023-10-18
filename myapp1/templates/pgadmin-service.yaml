@@ -11,6 +11,6 @@ spec:
       port: 8080
       targetPort: 80
   selector:
-    app: {{ .Values.appName}}
+    app: {{ .Values.appName }}
 status:
   loadBalancer: {}
