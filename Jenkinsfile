@@ -81,6 +81,7 @@ pipeline {
                 script {
                 sh '''
                 sed -i "s/tag:.*/tag: \"$DOCKER_TAG\"/" myapp1/values.yaml
+                cat myapp1/values.yaml
                 helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
                 '''
                 }
