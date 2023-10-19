@@ -48,7 +48,7 @@ pipeline {
             steps {
                 script {
                 sh '''
-                docker-compose build -f docker-compose.yml build
+                docker-compose build -f docker-compose.yml
                 sleep 6
                 '''
                 }
