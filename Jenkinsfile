@@ -63,7 +63,7 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
                         echo 'Performing Docker login'
-                        sh "docker login -u $DOCKER_ID -p ********"
+                        sh "docker login -u $DOCKER_ID -p $DOCKER_PASS"
                         sh "docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG"
                     }
                 }
