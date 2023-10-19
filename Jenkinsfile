@@ -21,11 +21,34 @@ pipeline {
                 }
         }
 
+        // stage('Docker Build') {
+        //     steps {
+        //         script {
+        //         sh '''
+        //         docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
+        //         sleep 6
+        //         '''
+        //         }
+        //     }
+        // }
+
+        // stage('Docker run') { // run container from our builded image
+        //         steps {
+        //             script {
+        //             sh '''
+        //             docker ps -a | grep -i fastapi && docker rm -f fastapi
+        //             docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+        //             sleep 10
+        //             '''
+        //             }
+        //         }
+        // }
+
         stage('Docker Build') {
             steps {
                 script {
                 sh '''
-                docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
+                docker-compose build -f docker-compose.yml build
                 sleep 6
                 '''
                 }
@@ -36,8 +59,8 @@ pipeline {
                 steps {
                     script {
                     sh '''
-                    docker ps -a | grep -i fastapi && docker rm -f fastapi
-                    docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                    docker ps
+                    docker-compose -f docker-compose.yml up -d
                     sleep 10
                     '''
                     }
