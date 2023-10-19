@@ -3,6 +3,8 @@ pipeline {
         DOCKER_ID = "vikinghacker"
         DOCKER_IMAGE = "fastapi_kubernetes"
         DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
+        KUBECONFIG = credentials("config")
+        DOCKER_PASS = credentials("DOCKER_HUB_PASS")
     }
     agent any // Jenkins will be able to select all available agents
 
@@ -57,33 +59,32 @@ pipeline {
         }
 
         stage('Docker Push') { //we pass the built image to our docker hub account
-            environment
-            {
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
-            }
-
             steps {
                 script {
-                sh '''
-                docker login -u $DOCKER_ID -p $DOCKER_PASS
-                docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
-                '''
+                    withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
+                        echo 'Performing Docker login'
+                        sh "docker login -u $DOCKER_ID -p ********"
+                        sh "docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG"
+                    }
                 }
             }
         }
 
         stage('Local Dev deployment') {
-            environment {
-                KUBECONFIG = credentials("config")
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS")
-            }
+            
             steps {
                 script {
-                sh '''
-                sed -i "s/tag:.*/tag: \"$DOCKER_TAG\"/" myapp1/values.yaml
-                cat myapp1/values.yaml
-                helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev
-                '''
+                    withCredentials([file(credentialsId: 'KUBECONFIG_CREDENTIAL_ID', variable: 'KUBECONFIG_FILE')]) {
+                        withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
+                            def valuesYamlPath = 'myapp1/values.yaml'
+                            def valuesDevYamlPath = 'myapp1/values-dev.yaml'
+                            sh """
+                                export KUBECONFIG=\$KUBECONFIG_FILE
+                                sed -i 's/tag:.*/tag: "$DOCKER_TAG"/' $valuesYamlPath
+                                helm upgrade --install myapp-release-dev myapp1/ --values $valuesYamlPath -f $valuesDevYamlPath -n dev
+                            """
+                        }
+                    }
                 }
             }
         }
