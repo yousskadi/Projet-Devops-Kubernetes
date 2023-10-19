@@ -71,10 +71,9 @@ pipeline {
         }
 
         stage('Local Dev deployment') {
-            
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'KUBECONFIG_CREDENTIAL_ID', variable: 'KUBECONFIG_FILE')]) {
+                    withCredentials([file(credentialsId: 'KUBECONFIG', variable: 'KUBECONFIG_FILE')]) {
                         withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
                             def valuesYamlPath = 'myapp1/values.yaml'
                             def valuesDevYamlPath = 'myapp1/values-dev.yaml'
