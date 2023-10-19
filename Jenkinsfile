@@ -18,6 +18,10 @@ pipeline {
                     sh 'kubectl delete all --all -n dev'
                     sh 'kubectl delete all --all -n staging'
                     sh 'kubectl delete all --all -n prod'
+                    sh '''
+                    docker rm -f $(docker ps -a -q)
+                    docker rmi -f $(docker images -a -q)
+                    '''
                 }
         }
 
@@ -44,7 +48,7 @@ pipeline {
         //         }
         // }
 
-        stage('Docker Build') {
+        stage('Docker image build') {
             steps {
                 script {
                 sh '''
@@ -55,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Docker run') { // run container from our builded image
+        stage('Docker image up') { // run container from our builded image
                 steps {
                     script {
                     sh '''
