@@ -15,6 +15,9 @@ pipeline {
                 steps {
                     sh 'docker system prune -a --volumes -f'
                     sh 'kubectl delete all --all -n default'
+                    sh 'kubectl delete all --all -n dev'
+                    sh 'kubectl delete all --all -n staging'
+                    sh 'kubectl delete all --all -n prod'
                 }
         }
 
@@ -33,7 +36,6 @@ pipeline {
                 steps {
                     script {
                     sh '''
-                    echo "Cleaning existing container if exist"
                     docker ps -a | grep -i fastapi && docker rm -f fastapi
                     docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
                     sleep 10
@@ -61,11 +63,9 @@ pipeline {
         stage('Docker Push') { //we pass the built image to our docker hub account
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
                         echo 'Performing Docker login'
                         sh "docker login -u $DOCKER_ID -p $DOCKER_PASS"
                         sh "docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG"
-                    }
                 }
             }
         }
@@ -73,17 +73,12 @@ pipeline {
         stage('Local Dev deployment') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'KUBECONFIG', variable: 'KUBECONFIG_FILE')]) {
-                        withCredentials([string(credentialsId: 'DOCKER_HUB_PASS', variable: 'DOCKER_PASS')]) {
-                            def valuesYamlPath = 'myapp1/values.yaml'
-                            def valuesDevYamlPath = 'myapp1/values-dev.yaml'
-                            sh """
-                                export KUBECONFIG=\$KUBECONFIG_FILE
-                                sed -i 's/tag:.*/tag: "$DOCKER_TAG"/' $valuesYamlPath
-                                helm upgrade --install myapp-release-dev myapp1/ --values $valuesYamlPath -f $valuesDevYamlPath -n dev
-                            """
-                        }
-                    }
+                    def valuesYamlPath = 'myapp1/values.yaml'
+                    def valuesDevYamlPath = 'myapp1/values-dev.yaml'
+                    sh """
+                        sed -i 's/tag:.*/tag: "$DOCKER_TAG"/' $valuesYamlPath
+                        helm upgrade --install myapp-release-dev myapp1/ --values $valuesYamlPath -f $valuesDevYamlPath -n dev
+                    """
                 }
             }
         }
