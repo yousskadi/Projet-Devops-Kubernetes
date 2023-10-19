@@ -18,10 +18,6 @@ pipeline {
                     sh 'kubectl delete all --all -n dev'
                     sh 'kubectl delete all --all -n staging'
                     sh 'kubectl delete all --all -n prod'
-                    sh '''
-                    docker rm -f $(docker ps -a -q)
-                    docker rmi -f $(docker images -a -q)
-                    '''
                 }
         }
 
