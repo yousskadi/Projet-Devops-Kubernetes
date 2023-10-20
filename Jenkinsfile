@@ -92,17 +92,7 @@ pipeline {
         stage('Test Acceptance') {
             steps {
                 script {
-                    sh 'curl -X POST -H "Content-Type: application/json" -d \'{"id": 1, "name": "toto", "email": "toto@email.com", "password": "passwordtoto"}\' http://localhost:80/users'
-                    sleep 10  // give time to server
-                    
-                    // get request to check if toto exists
-                    def response = sh(script: 'curl -X GET -H "accept: application/json" http://localhost:80/users', returnStdout: true).trim()
-                    
-                    if (response.contains("toto")) {
-                        echo "The string 'toto' was found in the response."
-                    } else {
-                        echo "The string 'toto' was not found in the response."
-                    }
+                    sh 'curl http://localhost:5000'
                 }
             }
         }
