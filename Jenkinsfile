@@ -60,7 +60,7 @@ pipeline {
                     script {
                     sh '''
                     docker ps
-                    docker-compose up
+                    docker-compose up -d
                     sleep 10
                     '''
                     }
@@ -71,8 +71,8 @@ pipeline {
             steps {
                     script {
                     sh '''
-                    curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' http://52.30.113.35:80
-                    if curl -X 'GET' -H 'accept: application/json' http://52.30.113.35:80/users | grep -qF "toto"; then
+                    curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}'http://0.0.0.0:5000:80
+                    if curl -X 'GET' -H 'accept: application/json' http://0.0.0.0:5000:80/users | grep -qF "toto"; then
                         echo "La chaîne 'titi' a été trouvée dans la réponse."
                     else
                         echo "La chaîne 'titi' n'a pas été trouvée dans la réponse."
@@ -81,6 +81,14 @@ pipeline {
                     }
             }
 
+        }
+
+        stage('Stop Docker image') {
+            steps {
+                script {
+                    sh 'docker-compose down'
+                }
+            }
         }
 
         stage('Docker Push') { //we pass the built image to our docker hub account
