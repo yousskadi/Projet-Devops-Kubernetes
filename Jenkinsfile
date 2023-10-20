@@ -26,11 +26,6 @@ pipeline {
         stage('Cleanup docker containers and images') {
             steps {
                 script {
-                    sh '''
-                    docker stop $(docker ps -a -q)
-                    docker rm $(docker ps -a -q)
-                    docker rmi -f $(docker images -q)
-                    '''
                     
                     def runningContainers = sh(script: 'docker ps', returnStatus: true)
                     if (runningContainers == 0) {
