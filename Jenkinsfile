@@ -30,6 +30,16 @@ pipeline {
                 docker rm $(docker ps -a -q)
                 docker rmi -f $(docker images -q)
                 '''
+                
+                def runningContainers = sh(returnStatus: true, script: 'docker ps')
+                if (runningContainers == 0) {
+                    echo "There are no running containers."
+                } else {
+                    sh 'docker stop $(docker ps -a -q)'
+                    sh 'docker rm $(docker ps -a -q)'
+                    sh 'docker rmi -f $(docker images -q)'
+                }
+
                 sh 'docker ps'
                 sh 'docker images'
             }
