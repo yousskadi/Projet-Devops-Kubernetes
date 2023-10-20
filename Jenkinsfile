@@ -30,8 +30,8 @@ pipeline {
                         // Check for existing containers
                         def existingContainers = sh(returnStatus: true, script: 'docker ps -q').toString().trim()
                         if (existingContainers) {
-                            sh 'docker stop $(docker ps -aq)'
-                            sh 'docker rm $(docker ps -aq)'
+                            sh "docker stop ${existingContainers}"
+                            sh "docker rm ${existingContainers}"
                         }
 
                         // Check for existing images
@@ -48,6 +48,7 @@ pipeline {
                 }
             }
         }
+
 
 
 
