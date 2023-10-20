@@ -35,8 +35,8 @@ pipeline {
                         }
 
                         // Check for existing images
-                        def existingImages = sh(returnStatus: true, script: 'docker images -q').toString().trim()
-                        if (existingImages) {
+                        def danglingImages = sh(returnStatus: true, script: 'docker images -q -f "dangling=true"').toString().trim()
+                        if (danglingImages) {
                             sh 'docker rmi $(docker images -q -f "dangling=true")'
                         }
 
