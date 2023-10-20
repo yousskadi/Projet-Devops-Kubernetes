@@ -11,6 +11,7 @@ pipeline {
     stages {
         // get rid of unused docker data and volumes and network and so on
         // clean kubernetes cluster
+        // docker system prune is for spaces reclaimed only
         stage('Clean stage') {
                 steps {
                     sh 'docker system prune -a --volumes -f'
@@ -22,23 +23,33 @@ pipeline {
         }
 
 
-        stage('Cleanup Docker Containers and Images') {
+        stage('Cleanup docker containers and images') {
             steps {
                 script {
-                    // check for existing containers
-                    def existingContainers = sh(returnStatus: true, script: 'docker ps -q').trim()
-                    if (existingContainers) {
-                        sh 'docker stop $(docker ps -aq)'
-                        sh 'docker rm $(docker ps -aq)'
-                    }
-                    // check for existing images
-                    def existingImages = sh(returnStatus: true, script: 'docker images -q').trim()
-                    if (existingImages) {
-                        sh 'docker rmi $(docker images -q -f "dangling=true")'
+                    try {
+                        // Check for existing containers
+                        def existingContainers = sh(returnStatus: true, script: 'docker ps -q').trim()
+                        if (existingContainers) {
+                            sh 'docker stop $(docker ps -aq)'
+                            sh 'docker rm $(docker ps -aq)'
+                        }
+
+                        // Check for existing images
+                        def existingImages = sh(returnStatus: true, script: 'docker images -q').trim()
+                        if (existingImages) {
+                            sh 'docker rmi $(docker images -q -f "dangling=true")'
+                        }
+
+                        currentBuild.result = 'SUCCESS'
+                    }  
+                    catch (Exception cleanupError) {
+                        currentBuild.result = 'FAILURE'
+                        error("Error during Docker cleanup: ${cleanupError}")
                     }
                 }
             }
         }
+
 
         // stage('Docker Build') {
         //     steps {
