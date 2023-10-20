@@ -21,6 +21,25 @@ pipeline {
                 }
         }
 
+
+        stage('Cleanup Docker Containers and Images') {
+            steps {
+                script {
+                    // check for existing containers
+                    def existingContainers = sh(returnStatus: true, script: 'docker ps -q').trim()
+                    if (existingContainers) {
+                        sh 'docker stop $(docker ps -aq)'
+                        sh 'docker rm $(docker ps -aq)'
+                    }
+                    // check for existing images
+                    def existingImages = sh(returnStatus: true, script: 'docker images -q').trim()
+                    if (existingImages) {
+                        sh 'docker rmi $(docker images -q -f "dangling=true")'
+                    }
+                }
+            }
+        }
+
         // stage('Docker Build') {
         //     steps {
         //         script {
@@ -73,14 +92,13 @@ pipeline {
                     sh '''
                     curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' http://0.0.0.0:80
                     if curl -X 'GET' -H 'accept: application/json' http://0.0.0.0:80/users | grep -qF "toto"; then
-                        echo "La chaîne 'titi' a été trouvée dans la réponse."
+                        echo "La chaîne 'toto' a été trouvée dans la réponse."
                     else
                         echo "La chaîne 'titi' n'a pas été trouvée dans la réponse."
                     fi  
                     '''
                     }
             }
-
         }
 
         stage('Stop Docker image') {
