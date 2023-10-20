@@ -25,27 +25,26 @@ pipeline {
 
         stage('Cleanup docker containers and images') {
             steps {
-                sh '''
-                docker stop $(docker ps -a -q)
-                docker rm $(docker ps -a -q)
-                docker rmi -f $(docker images -q)
-                '''
-                
-                def runningContainers = sh(returnStatus: true, script: 'docker ps')
-                if (runningContainers == 0) {
-                    echo "There are no running containers."
-                } else {
-                    sh 'docker stop $(docker ps -a -q)'
-                    sh 'docker rm $(docker ps -a -q)'
-                    sh 'docker rmi -f $(docker images -q)'
+                script {
+                    sh '''
+                    docker stop $(docker ps -a -q)
+                    docker rm $(docker ps -a -q)
+                    docker rmi -f $(docker images -q)
+                    '''
+                    
+                    def runningContainers = sh(script: 'docker ps', returnStatus: true)
+                    if (runningContainers == 0) {
+                        echo "No running containers found."
+                    } else {
+                        sh 'docker stop $(docker ps -aq)'
+                        sh 'docker rm $(docker ps -aq)'
+                        sh 'docker rmi -f $(docker images -q)'
+                    }
+                    sh 'docker ps'
+                    sh 'docker images'
                 }
-
-                sh 'docker ps'
-                sh 'docker images'
             }
         }
-
-
 
 
 
