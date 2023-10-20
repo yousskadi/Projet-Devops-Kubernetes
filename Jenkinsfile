@@ -107,36 +107,36 @@ pipeline {
             }
         }
 
-        stage('Stop Docker image') {
-            steps {
-                script {
-                    sh 'docker-compose down'
-                }
-            }
-        }
+        // stage('Stop Docker image') {
+        //     steps {
+        //         script {
+        //             sh 'docker-compose down'
+        //         }
+        //     }
+        // }
 
-        stage('Docker Push') { //we pass the built image to our docker hub account
-            steps {
-                script {
-                        echo 'Performing Docker login'
-                        sh "docker login -u $DOCKER_ID -p $DOCKER_PASS"
-                        sh "docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG"
-                }
-            }
-        }
+        // stage('Docker Push') { //we pass the built image to our docker hub account
+        //     steps {
+        //         script {
+        //                 echo 'Performing Docker login'
+        //                 sh "docker login -u $DOCKER_ID -p $DOCKER_PASS"
+        //                 sh "docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG"
+        //         }
+        //     }
+        // }
 
-        stage('Local Dev deployment') {
-            steps {
-                script {
-                    def valuesYamlPath = 'myapp1/values.yaml'
-                    def valuesDevYamlPath = 'myapp1/values-dev.yaml'
-                    sh """
-                        sed -i 's/tag:.*/tag: "$DOCKER_TAG"/' $valuesYamlPath
-                        helm upgrade --install myapp-release-dev myapp1/ --values $valuesYamlPath -f $valuesDevYamlPath -n dev
-                    """
-                }
-            }
-        }
+        // stage('Local Dev deployment') {
+        //     steps {
+        //         script {
+        //             def valuesYamlPath = 'myapp1/values.yaml'
+        //             def valuesDevYamlPath = 'myapp1/values-dev.yaml'
+        //             sh """
+        //                 sed -i 's/tag:.*/tag: "$DOCKER_TAG"/' $valuesYamlPath
+        //                 helm upgrade --install myapp-release-dev myapp1/ --values $valuesYamlPath -f $valuesDevYamlPath -n dev
+        //             """
+        //         }
+        //     }
+        // }
     }
 }   
 
