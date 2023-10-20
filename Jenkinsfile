@@ -28,15 +28,15 @@ pipeline {
                 script {
                     try {
                         // Check for existing containers
-                        def existingContainers = sh(returnStatus: true, script: 'docker ps -q').trim()
-                        if (existingContainers.toString()) {
+                        def existingContainers = sh(returnStatus: true, script: 'docker ps -q').toString().trim()
+                        if (existingContainers) {
                             sh 'docker stop $(docker ps -aq)'
                             sh 'docker rm $(docker ps -aq)'
                         }
 
                         // Check for existing images
-                        def existingImages = sh(returnStatus: true, script: 'docker images -q').trim()
-                        if (existingImages.toString()) {
+                        def existingImages = sh(returnStatus: true, script: 'docker images -q').toString().trim()
+                        if (existingImages) {
                             sh 'docker rmi $(docker images -q -f "dangling=true")'
                         }
 
@@ -48,6 +48,7 @@ pipeline {
                 }
             }
         }
+
 
 
         // stage('Docker Build') {
