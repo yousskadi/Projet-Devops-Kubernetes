@@ -79,18 +79,21 @@ pipeline {
                 }
         }
 
-        stage('Acceptance test') { // we launch the curl command to validate that the container responds to the request
+        stage('Test Acceptance') {
             steps {
-                    script {
-                    sh '''
-                    curl -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' http://0.0.0.0:80
-                    if curl -X 'GET' -H 'accept: application/json' http://0.0.0.0:80/users | grep -qF "toto"; then
-                        echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    else
-                        echo "La chaîne 'titi' n'a pas été trouvée dans la réponse."
-                    fi  
-                    '''
+                script {
+                    sh 'curl -X POST -H "Content-Type: application/json" -d \'{"id": 1, "name": "toto", "email": "toto@email.com", "password": "passwordtoto"}\' http://localhost:80/users'
+                    sleep 10  // give time to server
+                    
+                    // get request to check if toto exists
+                    def response = sh(script: 'curl -X GET -H "accept: application/json" http://localhost:80/users', returnStdout: true).trim()
+                    
+                    if (response.contains("toto")) {
+                        echo "The string 'toto' was found in the response."
+                    } else {
+                        echo "The string 'toto' was not found in the response."
                     }
+                }
             }
         }
 
