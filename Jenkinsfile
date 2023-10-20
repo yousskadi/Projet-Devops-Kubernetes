@@ -25,27 +25,7 @@ pipeline {
 
         stage('Cleanup docker containers and images') {
             steps {
-                script {
-                    try {
-                        // Check for existing containers
-                        def existingContainers = sh(returnStatus: true, script: 'docker ps -q').toString().trim()
-                        if (existingContainers) {
-                            sh "docker stop ${existingContainers}"
-                            sh "docker rm ${existingContainers}"
-                        }
-
-                        // Check for existing images
-                        def danglingImages = sh(returnStatus: true, script: 'docker images -q -f "dangling=true"').toString().trim()
-                        if (danglingImages) {
-                            sh 'docker rmi $(docker images -q -f "dangling=true")'
-                        }
-
-                        currentBuild.result = 'SUCCESS'
-                    } catch (Exception cleanupError) {
-                        currentBuild.result = 'FAILURE'
-                        error("Error during Docker cleanup: ${cleanupError}")
-                    }
-                }
+                sh 'docker image prune -a'
             }
         }
 
