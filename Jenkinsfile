@@ -29,20 +29,19 @@ pipeline {
                     try {
                         // Check for existing containers
                         def existingContainers = sh(returnStatus: true, script: 'docker ps -q').trim()
-                        if (existingContainers) {
+                        if (existingContainers.toString()) {
                             sh 'docker stop $(docker ps -aq)'
                             sh 'docker rm $(docker ps -aq)'
                         }
 
                         // Check for existing images
                         def existingImages = sh(returnStatus: true, script: 'docker images -q').trim()
-                        if (existingImages) {
+                        if (existingImages.toString()) {
                             sh 'docker rmi $(docker images -q -f "dangling=true")'
                         }
 
                         currentBuild.result = 'SUCCESS'
-                    }  
-                    catch (Exception cleanupError) {
+                    } catch (Exception cleanupError) {
                         currentBuild.result = 'FAILURE'
                         error("Error during Docker cleanup: ${cleanupError}")
                     }
