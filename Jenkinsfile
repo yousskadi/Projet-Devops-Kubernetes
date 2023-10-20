@@ -25,8 +25,10 @@ pipeline {
 
         stage('Cleanup docker containers and images') {
             steps {
-                sh 'docker container prune -f'
-                sh 'docker image prune -a -y'
+                sh '''
+                docker stop $(docker ps -a -q)
+                docker rm $(docker ps -a -q)
+                '''
                 sh 'docker ps'
                 sh 'docker images'
             }
