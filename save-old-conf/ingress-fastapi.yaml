@@ -1,53 +1,27 @@
-[?1049h[22;0;0t[>4;2m[?1h=[?2004h[?1004h[1;39r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[39;1H"/tmp/kubectl-edit-200862957.yaml" 30L, 777B[1;1H[34m# Please edit the object below. Lines beginning with a '#' will be ignored,
-# and an empty file will abort the edit. If an error occurs while saving this file will be
-# reopened with the relevant failures.
-#[m
-[36mapiVersion[m[35m:[m networking.k8s.io/v1
-[36mkind[m[35m:[m Ingress
-[36mmetadata[m[35m:[m
-  [36mannotations[m[35m:[m
-    [36mnginx.ingress.kubernetes.io/rewrite-target[m[35m:[m /
-  [36mcreationTimestamp[m[35m:[m [31m"2023-10-20T19:31:07Z"[m
-  [36mgeneration[m[35m:[m [31m2[m
-  [36mname[m[35m:[m ingress-fastapi
-  [36mnamespace[m[35m:[m dev
-  [36mresourceVersion[m[35m:[m [31m"65374"[m
-  [36muid[m[35m:[m d1e2b7d4-382f-42a9-9e2f-8f0b84b9cc3e
-[36mspec[m[35m:[m
-  [36mingressClassName[m[35m:[m nginx
-  [36mrules[m[35m:[m
-  [38;5;130m- [m[36mhost[m[35m:[m fastapi.service.com
-    [36mhttp[m[35m:[m[21;7H[36mpaths[m[35m:[m[22;7H[38;5;130m- [m[36mbackend[m[35m:[m[23;11H[36mservice[m[35m:[m[24;13H[36mname[m[35m:[m fastapi-dev[25;13H[36mport[m[35m:[m[26;15H[36mnumber[m[35m:[m [31m5000[m[27;9H[36mpath[m[35m:[m /api[28;9H[36mpathType[m[35m:[m Exact
-[36mstatus[m[35m:[m
-  [36mloadBalancer[m[35m:[m [35m{}[m
-[94m~                                                                                                                                                             [32;1H~                                                                                                                                                             [33;1H~                                                                                                                                                             [34;1H~                                                                                                                                                             [35;1H~                                                                                                                                                             [36;1H~                                                                                                                                                             [37;1H~                                                                                                                                                             [38;1H~                                                                                                                                                             [m[39;141H1,1[10CTout[1;1H[?25h[?25l[39;131H^M[1;1H[39;131H  [2;1H[39;141H2[2;1H[?25h[?25l[39;1HTapez  :qa  puis <Entré[39;24He> pour quitter Vim[39;43H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;141H[K[39;141H2,1[10CTout[2;1H[?25h[?25l[39;131H~@k[2;1H[39;131H   [1;1H[39;141H1[1;1H[?25h[?25l[39;131H~@k[1;1H[39;131H   [1;1H[?25h[?25l[39;131H~@k[1;1H[39;131H   [1;1H[?25h[?25l[39;131He[1;1H[39;131H [1;8H[39;143H8[1;8H[?25h[?25l[39;131Hx[1;8H[39;131H [1;8H[39;131Hdl[1;8H[39;131H  [1;8H[34m edit the object below. Lines beginning with a '#' will be ignored,[m[1;75H[K[1;8H[?25h[?25l[39;131Hi[1;8H[39;131H [1;8H[39;1H[1m-- INSERTION --[m[39;16H[K[39;141H1,8[10CTout[1;8H[?25h[?25l[34mt edit the object below. Lines beginning with a '#' will be ignored,[m[39;143H9[1;9H[?25h[?25l[2;38r[2;1H[L[1;39r[1;9H[K[2;1H[34m#  edit the object below. Lines beginning with a '#' will be ignored,[m[39;141H[K[39;141H2,3[10CTout[2;3H[?25h[?25l[34mq edit the object below. Lines beginning with a '#' will be ignored,[m[39;143H4[2;4H[?25h[?25l[3;38r[3;1H[L[1;39r[2;4H[K[3;1H[34m#  edit the object below. Lines beginning with a '#' will be ignored,[m[39;141H[K[39;141H3,3[10CTout[3;3H[?25h[?25l[4;38r[4;1H[L[1;39r[3;2H[K[4;1H[34m#  edit the object below. Lines beginning with a '#' will be ignored,[m[39;141H[K[39;141H4,3[10CTout[4;3H[?25h[?25l[5;38r[5;1H[L[1;39r[4;2H[K[5;1H[34m#  edit the object below. Lines beginning with a '#' will be ignored,[m[39;141H[K[39;141H5,3[10CTout[5;3H[?25h[?25l[6;38r[6;1H[L[1;39r[5;2H[K[6;1H[34m#  edit the object below. Lines beginning with a '#' will be ignored,[m[39;141H[K[39;141H6,3[10CTout[6;3H[?25h[27m[23m[29m[m[H[2J[?25l[1;1H[34m# Pleast
-# q
-#
-#
-#
-#  edit the object below. Lines beginning with a '#' will be ignored,
-# and an empty file will abort the edit. If an error occurs while saving this file will be
-# reopened with the relevant failures.
-#[m
-[36mapiVersion[m[35m:[m networking.k8s.io/v1
-[36mkind[m[35m:[m Ingress
-[36mmetadata[m[35m:[m
-  [36mannotations[m[35m:[m
-    [36mnginx.ingress.kubernetes.io/rewrite-target[m[35m:[m /
-  [36mcreationTimestamp[m[35m:[m [31m"2023-10-20T19:31:07Z"[m
-  [36mgeneration[m[35m:[m [31m2[m
-  [36mname[m[35m:[m ingress-fastapi
-  [36mnamespace[m[35m:[m dev
-  [36mresourceVersion[m[35m:[m [31m"65374"[m
-  [36muid[m[35m:[m d1e2b7d4-382f-42a9-9e2f-8f0b84b9cc3e
-[36mspec[m[35m:[m
-  [36mingressClassName[m[35m:[m nginx
-  [36mrules[m[35m:[m
-  [38;5;130m- [m[36mhost[m[35m:[m fastapi.service.com
-    [36mhttp[m[35m:[m[26;7H[36mpaths[m[35m:[m[27;7H[38;5;130m- [m[36mbackend[m[35m:[m[28;11H[36mservice[m[35m:[m[29;13H[36mname[m[35m:[m fastapi-dev[30;13H[36mport[m[35m:[m[31;15H[36mnumber[m[35m:[m [31m5000[m[32;9H[36mpath[m[35m:[m /api[33;9H[36mpathType[m[35m:[m Exact
-[36mstatus[m[35m:[m
-  [36mloadBalancer[m[35m:[m [35m{}[m
-[94m~                                                                                                                                                        [m[37;1H[1m-- INSERTION --[m[120C6,3[10CTout[6;3H[?25h[37;1H[?2004l[>4;m[?1004l[?2004l[?1l>[>4;m[?1049l[23;0;0tVim : Erreur lors de la lecture de l'entrée, sortie...
-Vim: preserving files...
-Vim: Finished.
-[37;1H[23;2t[23;1t[J
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  creationTimestamp: "2023-10-20T19:31:07Z"
+  generation: 2
+  name: ingress-fastapi
+  namespace: dev
+  resourceVersion: "65374"
+  uid: d1e2b7d4-382f-42a9-9e2f-8f0b84b9cc3e
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: fastapi.service.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: fastapi-dev
+            port:
+              number: 5000
+        path: /api
+        pathType: Exact
+status:
+  loadBalancer: {}
+
