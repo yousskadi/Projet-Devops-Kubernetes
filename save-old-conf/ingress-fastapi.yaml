@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-  creationTimestamp: "2023-10-20T19:31:07Z"
-  generation: 2
   name: ingress-fastapi
   namespace: dev
   resourceVersion: "65374"
@@ -21,7 +19,15 @@ spec:
             port:
               number: 5000
         path: /api
-        pathType: Exact
+        pathType: Prefix
+      - backend:
+          service:
+            name: pgadmin-dev
+            port:
+              number: 8080
+        path: /pgadm
+        pathType: Prefix
+    
 status:
   loadBalancer: {}
 
