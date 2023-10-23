@@ -9,4 +9,3 @@ namespace: default
 image:
   name: ykadi/datascientestapi
   tag: ""
-
