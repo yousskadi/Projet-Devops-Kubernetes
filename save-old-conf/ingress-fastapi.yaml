@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ingress-fastapi
+  namespace: dev
+  resourceVersion: "65374"
+  uid: d1e2b7d4-382f-42a9-9e2f-8f0b84b9cc3e
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: fastapi.service.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: fastapi-dev
+            port:
+              number: 5000
+        path: /api
+        pathType: Prefix
+      - backend:
+          service:
+            name: pgadmin-dev
+            port:
+              number: 8080
+        path: /pgadm
+        pathType: Prefix
+    
+status:
+  loadBalancer: {}
+
