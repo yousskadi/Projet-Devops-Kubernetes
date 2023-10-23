@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-pgadmin 
-  namespace: dev 
-  generation: 2 
+  name: ingress-pgadmin
+  namespace: dev
+  generation: 2
   annotations:
     #nginx.ingress.kubernetes.io/rewrite-target: /
     #kubernetes.io/ingress.class: "nginx"
@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: public.my-services.com 
+  - host: www.devops-youss.cloudns.ph 
     http:
       paths:
       - path: /pgadmin
