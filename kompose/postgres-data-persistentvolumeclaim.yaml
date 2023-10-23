@@ -4,11 +4,10 @@ metadata:
   labels:
     app: postgres-data
   name: postgres-data
-  namespace: {{ .Values.namespace }}
+  namespace: default
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
-status: {}

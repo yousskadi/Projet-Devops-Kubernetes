@@ -7,7 +7,6 @@ metadata:
   namespace: default
 spec:
   replicas: 1
-  serviceName: db
   selector:
     matchLabels:
       app: db
@@ -35,11 +34,9 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 100Mi
+      restartPolicy: Always
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+status: {}

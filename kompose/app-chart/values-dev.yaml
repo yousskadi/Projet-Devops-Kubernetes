@@ -1,0 +1,17 @@
+replicaCount: 1
+namespace: dev
+pgName: pgadmin-dev
+fastapiName: fastapi-dev
+dbName: db-dev
+image:
+  repository_app: "bfaycal2020/projet_kube"
+  repository_db: "postgres"
+  repositrory_pg: "dpage/pgadmin4"
+  tag_app: "v.10.0"
+  tag_db: "12.0-alpine"
+  pullPolicy: IfNotPresent
+service:
+  name: fastapi-nodeport
+  type: NodePort
+  port: 5000  
+  

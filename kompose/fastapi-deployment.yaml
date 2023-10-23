@@ -17,11 +17,10 @@ spec:
         app: fastapi
     spec:
       containers:
-        - image: ykadi/datascientestapi:v.5.0
+        - image: bfaycal2020/projet_kube:v.10.0
           name: fastapi
           ports:
             - containerPort: 5000
               protocol: TCP
           resources: {}
       restartPolicy: Always
-status: {}

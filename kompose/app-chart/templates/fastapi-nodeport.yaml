@@ -3,13 +3,12 @@ kind: Service
 metadata:
   labels:
     app: {{ .Values.fastapiName }}
-  name: {{ .Values.fastapiNodeport }}
+  name: {{ .Values.service.name}}
 spec:
   ports:
-  - port: 5000
+  - port: {{ .Values.service.port }}
     protocol: TCP
-    targetPort: 5000
+    targetPort: {{ .Values.service.port }}
   selector:
     app: {{ .Values.fastapiName }}
-  type: NodePort
-
+  type: {{ .Values.service.type }}

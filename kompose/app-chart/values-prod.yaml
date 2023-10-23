@@ -1,0 +1,14 @@
+replicaCount: 1
+namespace: prod
+pgName: pgadmin-prod
+fastapiName: fastapi-prod
+dbName: db-prod
+image:
+  repository_app: "bfaycal2020/projet_kube:v.10.0"
+  repository_db: "postgres"
+  tag_app: "latest"
+  tag_db: "12.0-alpine"
+  pullPolicy: IfNotPresent
+service:
+  type: NodePort
+  port: 80 

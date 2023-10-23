@@ -7,10 +7,8 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-    - name: "5000"
-      port: 5000
-      targetPort: 5000
+    - name: "80"
+      port: 80
+      targetPort: {{ .Values.service.port }}
   selector:
     app: {{ .Values.fastapiName }}
-status:
-  loadBalancer: {}

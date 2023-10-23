@@ -1,1 +1,3 @@
-/kompose/*
+__pycache__
+./.terraform
+

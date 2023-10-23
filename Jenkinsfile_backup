@@ -1,0 +1,52 @@
+pipeline{
+    environment{
+        DOCKER_ID = "bfaycal2020" // replace this with your docker-id
+        DOCKER_IMAGE = "projet_kube"
+        DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
+        DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+    }
+    agent any 
+    stages{
+        stage('Docker Build'){
+            steps{
+                script{
+                sh'''
+                echo "JE suis Docker Build"
+                docker rm -f jenkins
+                docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG . 
+                sleep 90
+                '''
+                }
+            }
+        }
+        stage('Docker run'){
+            steps{
+                script{
+                sh'''
+                docker-compose up -d
+                '''
+                }
+            }    
+        }
+        stage('Test Acceptance'){
+            steps {
+                script {
+                sh'''
+                curl 52.19.162.74:80
+                '''
+                }
+            }
+        }
+        stage('Docker Push'){
+            steps {
+                script{
+                sh'''
+                docker login -u $DOCKER_ID -p $DOCKER_PASS
+                docker push $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
+                '''
+                }
+            }
+        }
+    }
+
+}

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: projet-devops-kubernetes
+description: ceci est un projet de k8s et helm
+version: 0.1.0

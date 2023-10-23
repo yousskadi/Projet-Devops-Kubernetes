@@ -1,0 +1,7 @@
+replicaCount: 2
+image:
+  repository: "bfaycal2020/projet_kube"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+service:
+  type: NodePort

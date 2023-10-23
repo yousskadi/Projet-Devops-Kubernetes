@@ -2,15 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: pgadmin
-  name: pgadmin
-  namespace: default
+    app: {{ .Values.pgName }}
+  name: {{ .Values.pgName }}
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - name: "8080"
       port: 8080
       targetPort: 80
   selector:
-    app: pgadmin
-status:
-  loadBalancer: {}
+    app: {{ .Values.pgName }}
