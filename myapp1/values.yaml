@@ -9,3 +9,5 @@ namespace: default
 image:
   name: ykadi/datascientestapi
   tag: ""
+
+hostIngress: www.devops-youss.cloudns.ph
