@@ -78,30 +78,30 @@ stages {
 
                 }
 
-        stage('Deploiement en prod'){
-                environment
-                {
-                KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-                AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-                AWS_DEFAULT_REGION = "eu-west-3"
-                }
-                    steps {
-                    // Create an Approval Button with a timeout of 15minutes.
-                    // this require a manuel validation in order to deploy on production environment
-                            timeout(time: 15, unit: "MINUTES") {
-                                input message: 'Do you want to deploy in production ?', ok: 'Yes'
-                            }
+        // stage('Deploiement en prod'){
+        //         environment
+        //         {
+        //         KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        //         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        //         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        //         AWS_DEFAULT_REGION = "eu-west-3"
+        //         }
+        //             steps {
+        //             // Create an Approval Button with a timeout of 15minutes.
+        //             // this require a manuel validation in order to deploy on production environment
+        //                     timeout(time: 15, unit: "MINUTES") {
+        //                         input message: 'Do you want to deploy in production ?', ok: 'Yes'
+        //                     }
 
-                        script {
-                        sh '''
-                         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                         helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --set postgres-pv=false
-                        '''
-                        }
-                    }
+        //                 script {
+        //                 sh '''
+        //                  sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
+        //                  helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --set postgres-pv=false
+        //                 '''
+        //                 }
+        //             }
 
-                }
+        //         }
 
         stage('Prune Docker data') {
                 steps {
@@ -110,18 +110,18 @@ stages {
 
         }
     }
-        post { // send email when the job has failed
-            success {
-                script {
-                    slackSend botUser: true, color: 'good', message: 'Successful :jenkins-${JOB_NAME}-${BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-                }
-            }
+        // post { // send email when the job has failed
+        //     success {
+        //         script {
+        //             slackSend botUser: true, color: 'good', message: 'Successful :jenkins-${JOB_NAME}-${BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+        //         }
+        //     }
             
-            failure {
-                script {
-                    slackSend botUser: true, color: 'danger', message: 'Failure :jenkins-${JOB_NAME}-${BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-                }
-            }
+        //     failure {
+        //         script {
+        //             slackSend botUser: true, color: 'danger', message: 'Failure :jenkins-${JOB_NAME}-${BUILD_ID}', teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+        //         }
+        //     }
             // ..
             /*
             failure {
@@ -132,5 +132,5 @@ stages {
             }
             */
             // ..
-        }
+       // }
     }
