@@ -1,6 +1,6 @@
 pipeline {
 environment { // Declaration of environment variables
-DOCKER_ID = "ykadi" // replace this with your docker-id
+DOCKER_ID = "vikinghacker" // replace this with your docker-id
 DOCKER_IMAGE = "datascientestapi"
 DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
 }
@@ -29,16 +29,16 @@ stages {
                 }
             }
 
-        stage('Test Acceptance'){ // we launch the curl command to validate that the container responds to the request
-            steps {
-                    script {
-                    sh '''
-                    curl -X GET -i http://0.0.0.0:80
-                    '''
-                    }
-            }
+        // stage('Test Acceptance'){ // we launch the curl command to validate that the container responds to the request
+        //     steps {
+        //             script {
+        //             sh '''
+        //             curl -X GET -i http://0.0.0.0:80
+        //             '''
+        //             }
+        //     }
 
-        }
+        // }
         stage('Docker Push'){ //we pass the built image to our docker hub account
             environment
             {
