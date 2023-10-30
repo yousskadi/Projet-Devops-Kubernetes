@@ -4,7 +4,7 @@ metadata:
   labels:
     type: local   
     app: db
-  name: postgres-pv-volume
+  name: postgres-pv2-volume
 spec:
   storageClassName: manual
   capacity:
@@ -13,4 +13,3 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/mnt/data"
-  
