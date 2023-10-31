@@ -4,11 +4,16 @@ metadata:
   name: ingress-fastapi
   namespace: {{ .Values.namespace }}
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     # Ajoutez vos annotations ici
 spec:
+  tls:
+   - hosts:
+     - {{ .Values.hostIngress1 }}
+     secretName: letsencrypt-prod2
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.hostIngress }}
+  - host: {{ .Values.hostIngress1 }}
     http:
       paths:
       - path: /

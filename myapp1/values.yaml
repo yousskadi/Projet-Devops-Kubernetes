@@ -10,4 +10,5 @@ image:
   name: ykadi/datascientestapi
   tag: ""
 
-hostIngress: www.devops-youss.cloudns.ph
+hostIngress1: www.devops-youss.cloudns.ph
+hostIngress2: pgadmin.devops-youss.cloudns.ph
