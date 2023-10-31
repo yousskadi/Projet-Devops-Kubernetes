@@ -14,7 +14,7 @@
 	
 	
 	
-# install prometheus-grafana
+# Install Prometheus-Grafana
 
 	helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
 --namespace kube-prometheus-stack --create-namespace \
@@ -22,5 +22,23 @@
 	
 # expose Grafana
 	
-	kubectl create ingress --namespace kube-prometheus-stack grafana \
+kubectl create ingress --namespace kube-prometheus-stack grafana \
 --rule=grafana.cloudnative.party/*=kube-prometheus-stack-grafana:80
+
+kubectl create ingress --namespace kube-prometheus-stack grafana \
+--class=nginx --rule="grafana.devops-youss.cloudns.ph/*=kube-prometheus-stack-grafana:80,tls=grafana-secret" \
+--annotation  "cert-manager.io/cluster-issuer=letsencrypt-prod"
+
+
+Grafana credentials
+	• What could the login and password be?
+	• Let's look at the Secrets available in the namespace:
+
+kubectl get secrets --namespace kube-prometheus-stack
+	
+	• There is a kube-prometheus-stack-grafana that looks promising!
+	• Decode the Secret:
+
+kubectl get secret --namespace kube-prometheus-stack \
+kube-prometheus-stack-grafana -o json | jq '.data | map_values(@base64d)'
+	
