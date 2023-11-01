@@ -85,15 +85,34 @@ pipeline {
             steps {
                 script {
                     // def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true, returnStdout: true).trim()
-                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true).trim()
+                    // def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
+
+
+                    def pgadminResponse = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
+                    def pgadminStatus = pgadminResponse.exitStatus
+                    def pgadminHttpCode = pgadminResponse.stdout.trim()
                     
-                    echo "my pgadminStatus is ${pgadminStatus}"
-                    // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
-                    if (pgadminStatus == '200' || pgadminStatus == '302') {
+                    echo "my pgadminStatus is ${pgadminHttpCode}"
+            
+                    if (pgadminStatus == 0 && (pgadminHttpCode == '200' || pgadminHttpCode == '302')) {
                         echo "Fast API and PgAdmin are running fine"
                     } else {
-                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                        error("Fast API or PgAdmin is not working, check the pipeline log to see which one failed")
                     }
+
+
+
+
+
+
+
+
+                    // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
+                    // if (pgadminStatus == '200' || pgadminStatus == '302') {
+                    //     echo "Fast API and PgAdmin are running fine"
+                    // } else {
+                    //     error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                    // }
                 }                           
             }
         }   
