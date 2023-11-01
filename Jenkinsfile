@@ -65,21 +65,21 @@ pipeline {
         //         }
         // }
 
-        stage('Image test') {
-            steps {
-                script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
-                    def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
+        // stage('Image test') {
+        //     steps {
+        //         script {
+        //             def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
+        //             def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
 
-                    if (fastapiStatus == 200 && pdagminStatus == 200 || pdagminStatus == 302 ) {
-                        echo "Fast api and pdagmin are running fine"
+        //             if (fastapiStatus == 200 && pdagminStatus == 200 || pdagminStatus == 302 ) {
+        //                 echo "Fast api and pdagmin are running fine"
                         
-                    } else {
-                        error("Fast api or pgadmin is not working, check pipeline log to see which one failed")
-                    }
-                }
-            }
-        }
+        //             } else {
+        //                 error("Fast api or pgadmin is not working, check pipeline log to see which one failed")
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Image test') {
             steps {
