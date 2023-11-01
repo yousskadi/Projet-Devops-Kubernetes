@@ -126,7 +126,7 @@ agent any
             }           
         }
 
-        stage('Staging deployment') {
+    /*    stage('Staging deployment') {
             steps {
                 script {
                     sh '''
@@ -149,7 +149,7 @@ agent any
                 }
             }
         }
-
+*/
         stage('Production deployment') {
             steps {
                 // Create an Approval Button with a timeout of 15minutes.
