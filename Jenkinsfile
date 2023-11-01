@@ -136,8 +136,8 @@ agent any
                     else
                         echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
                     fi'''
-                    def code_retour = sh '''curl -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"''' 
-                    def count = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
+                    def code_retour = sh('curl -i  https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"', returnStatus: true) 
+                    def count = sh('curl 'GET' -i  https://www.devops-youss.cloudns.ph/users/1', returnStatus: true) 
                     
                     if (code_retour == 200 ) {
                         echo $count
