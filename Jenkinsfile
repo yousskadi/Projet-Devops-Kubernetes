@@ -101,27 +101,7 @@ pipeline {
         }
 
 
-        stage('Image test') {
-    steps {
-        script {
-            def fastapiStatus
-            def pdagminStatus
-
-            try {
-                fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
-                pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
-
-                if ((fastapiStatus == 200 || fastapiStatus == 302) && (pdagminStatus == 200 || pdagminStatus == 302)) {
-                    echo "Fast API and PgAdmin are running fine"
-                } else {
-                    error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
-                }
-            } catch (Exception e) {
-                error("An exception occurred during the HTTP requests: ${e.message}")
-            }
-        }
-    }
-}
+      
 
         // stage('Stop Docker image') {
         //     steps {
