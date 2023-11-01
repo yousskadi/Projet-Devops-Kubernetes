@@ -166,12 +166,7 @@ agent any
             }
         }
 
-        stage('Prune Docker data') {
-                steps {
-                    sh 'docker system prune -a --volumes -f'
-                }
-
-        }
+        
     }
     
     post { // send email when the job has failed
