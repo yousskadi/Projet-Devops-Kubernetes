@@ -88,13 +88,11 @@ pipeline {
                     // def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
 
 
-                    def pgadminResponse = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
-                    def pgadminStatus = pgadminResponse.exitStatus
-                    def pgadminHttpCode = pgadminResponse.stdout.trim()
-                    
-                    echo "my pgadminStatus is ${pgadminHttpCode}"
+                    def pgadminResponse = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
             
-                    if (pgadminStatus == 0 && (pgadminHttpCode == '200' || pgadminHttpCode == '302')) {
+                    echo "pgdamdin code: ${pgadminResponse}"
+                    
+                    if (pgadminResponse == '200' || pgadminResponse == '302') {
                         echo "Fast API and PgAdmin are running fine"
                     } else {
                         error("Fast API or PgAdmin is not working, check the pipeline log to see which one failed")
