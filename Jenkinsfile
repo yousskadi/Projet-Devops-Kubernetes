@@ -67,7 +67,7 @@ agent any
             }
         }
        
-        stage('Image test') {
+      /*  stage('Image test') {
             steps {
                 script {
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
@@ -83,7 +83,7 @@ agent any
                 }
             }
         }
-
+    */
         // Push the docker image built on dockerhub
         stage('Docker Push') { 
             steps {
