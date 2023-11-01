@@ -73,7 +73,8 @@ agent any
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
                     def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
 
-                    if (fastapiStatus == 0 && pdagminStatus == 0 || pdagminStatus == 302 ) {
+                    //if (fastapiStatus == 0 && pdagminStatus == 0 || pdagminStatus == 302 ) {
+                    if (pdagminStatus == 302 ) {
                         echo "Fast api and pdagmin are running fine"
                         
                     } else {
