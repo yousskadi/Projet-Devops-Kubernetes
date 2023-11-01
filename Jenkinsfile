@@ -96,7 +96,7 @@ agent any
             }
         }
 
-        stage('Local deployment') {
+        stage('Dev deployment') {
             steps {
                 script {
                     sh '''
