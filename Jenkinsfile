@@ -86,6 +86,7 @@ pipeline {
                 script {
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
                     def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
+                    sh "echo pdagminStatus is a ${pdagminStatus.class}"
                     
                     // if ((fastapiStatus == 200) && (pdagminStatus == 200 || pdagminStatus == 302)) {
                     if (pdagminStatus == "302") {
