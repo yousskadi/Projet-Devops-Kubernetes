@@ -12,7 +12,6 @@ pipeline {
 
 agent any 
     stages {
-
         stage('Cleanup docker containers and images') {
             steps {
                 script {
@@ -74,7 +73,7 @@ agent any
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
                     def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
 
-                    if (fastapiStatus == 200 && pdagminStatus == 200 or pdagminStatus == 302 ) {
+                    if (fastapiStatus == 200 && pdagminStatus == 200 || pdagminStatus == 302 ) {
                         echo "Fast api and pdagmin are running fine"
                         
                     } else {
@@ -136,11 +135,13 @@ agent any
                     else
                         echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
                     fi'''
-                    def code_retour = sh '''curl -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"''' 
-                    def count = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
+                    def code_retour = sh(script: 'curl -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"', returnStatus: true) 
+                    // def count_return = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
+                    def count_return = sh(script: "curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1", returnStdout: true).trim()
                     
+
                     if (code_retour == 200 ) {
-                        echo $count
+                        echo $count_return
                     } else {
                         error("pas de retour de l'api")
                     }    
