@@ -87,7 +87,7 @@ pipeline {
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
                     def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
                     
-                    sh '''echo "my pgadminStatus is ${pgadminStatus}"'''
+                    sh '''echo my pgadminStatus is ${pgadminStatus}'''
                     // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
                     if (pgadminStatus == 302) {
                         echo "Fast API and PgAdmin are running fine"
