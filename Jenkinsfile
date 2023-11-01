@@ -69,6 +69,10 @@ stages {
                     steps {
                         script {
                         sh '''
+                        helm upgrade --install ingress-nginx ingress-nginx \
+	                    --repo https://kubernetes.github.io/ingress-nginx \
+	                    --namespace ingress-nginx --create-namespace     
+                        sleep 10
                         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                         helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
                         '''
