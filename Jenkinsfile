@@ -87,10 +87,9 @@ stages {
                         helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
                         
                         echo "Installation stack Prometheus-Grafana"
-                        helm install cert-manager cert-manager \
-                        --repo https://charts.jetstack.io \
-                        --create-namespace --namespace cert-manager \
-                        --set installCRDs=true
+                        helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+                        --namespace kube-prometheus-stack --create-namespace \
+                        --repo https://prometheus-community.github.io/helm-charts
                         '''
                         }
                     }
