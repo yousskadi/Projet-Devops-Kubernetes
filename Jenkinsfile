@@ -22,48 +22,48 @@ pipeline {
         //         }
         // }
 
-        stage('Cleanup docker containers and images') {
-            steps {
-                script {
+        // stage('Cleanup docker containers and images') {
+        //     steps {
+        //         script {
                     
-                    def runningContainers = sh(script: 'docker ps', returnStatus: true)
-                    if (runningContainers == 0) {
-                        echo "No running containers found."
-                    } else {
-                        sh 'docker stop $(docker ps -aq)'
-                        sh 'docker rm $(docker ps -aq)'
-                        sh 'docker rmi -f $(docker images -q)'
-                    }
-                    sh 'docker ps'
-                    sh 'docker images'
-                }
-            }
-        }
+        //             def runningContainers = sh(script: 'docker ps', returnStatus: true)
+        //             if (runningContainers == 0) {
+        //                 echo "No running containers found."
+        //             } else {
+        //                 sh 'docker stop $(docker ps -aq)'
+        //                 sh 'docker rm $(docker ps -aq)'
+        //                 sh 'docker rmi -f $(docker images -q)'
+        //             }
+        //             sh 'docker ps'
+        //             sh 'docker images'
+        //         }
+        //     }
+        // }
 
         // Build docker image
-        stage('Docker image build') {
-            steps {
-                script {
-                sh '''
-                docker-compose build
-                sleep 6
-                '''
-                }
-            }
-        }
+        // stage('Docker image build') {
+        //     steps {
+        //         script {
+        //         sh '''
+        //         docker-compose build
+        //         sleep 6
+        //         '''
+        //         }
+        //     }
+        // }
 
         // Run the docker image
-        stage('Docker image up') {
-                steps {
-                    script {
-                    sh '''
-                    docker ps
-                    docker-compose up -d
-                    sleep 10
-                    '''
-                    }
-                }
-        }
+        // stage('Docker image up') {
+        //         steps {
+        //             script {
+        //             sh '''
+        //             docker ps
+        //             docker-compose up -d
+        //             sleep 10
+        //             '''
+        //             }
+        //         }
+        // }
 
         stage('Image test') {
             steps {
