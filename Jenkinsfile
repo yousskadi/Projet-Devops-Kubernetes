@@ -89,7 +89,7 @@ pipeline {
                     
                     echo "my pgadminStatus is ${pgadminStatus}"
                     // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
-                    if (pgadminStatus == 0) {
+                    if (pgadminStatus == 200 || pgadminStatus == 302) {
                         echo "Fast API and PgAdmin are running fine"
                     } else {
                         error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
