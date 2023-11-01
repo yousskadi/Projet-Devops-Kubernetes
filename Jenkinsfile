@@ -76,7 +76,7 @@ stages {
                         sleep 10
 
                         echo "Installation Cert-Manager"
-                        helm install cert-manager cert-manager \
+                        helm upgrade --install cert-manager cert-manager \
                         --repo https://charts.jetstack.io \
                         --create-namespace --namespace cert-manager \
                         --set installCRDs=true
