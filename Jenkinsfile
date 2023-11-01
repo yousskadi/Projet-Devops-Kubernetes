@@ -69,12 +69,28 @@ stages {
                     steps {
                         script {
                         sh '''
+                        echo "Installation Ingress-controller Nginx"
                         helm upgrade --install ingress-nginx ingress-nginx \
 	                    --repo https://kubernetes.github.io/ingress-nginx \
 	                    --namespace ingress-nginx --create-namespace     
                         sleep 10
+
+                        echo "Installation Cert-Manager"
+                        helm install cert-manager cert-manager \
+                        --repo https://charts.jetstack.io \
+                        --create-namespace --namespace cert-manager \
+                        --set installCRDs=true
+                        sleep 10
+                        
+                        echo "Installation Projet Devops 2023"
                         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                         helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+                        
+                        echo "Installation stack Prometheus-Grafana"
+                        helm install cert-manager cert-manager \
+                        --repo https://charts.jetstack.io \
+                        --create-namespace --namespace cert-manager \
+                        --set installCRDs=true
                         '''
                         }
                     }
