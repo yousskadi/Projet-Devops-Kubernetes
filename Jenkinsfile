@@ -12,16 +12,15 @@ pipeline {
         // get rid of unused docker data and volumes and network and so on
         // clean kubernetes cluster
         // docker system prune is for spaces reclaimed only
-        // stage('Clean stage') {
-        //         steps {
-        //             sh 'docker system prune -a --volumes -f'
-        //             sh 'kubectl delete all --all -n default'
-        //             sh 'kubectl delete all --all -n dev'
-        //             sh 'kubectl delete all --all -n staging'
-        //             sh 'kubectl delete all --all -n prod'
-        //         }
-        // }
-
+        stage('Clean stage') {
+                steps {
+                    sh 'docker system prune -a --volumes -f'
+                    sh 'kubectl delete all --all -n default'
+                    sh 'kubectl delete all --all -n dev'
+                    sh 'kubectl delete all --all -n staging'
+                    sh 'kubectl delete all --all -n prod'
+                }
+        }
 
         stage('Cleanup docker containers and images') {
             steps {
@@ -41,6 +40,7 @@ pipeline {
             }
         }
 
+        // Build docker image
         stage('Docker image build') {
             steps {
                 script {
@@ -52,7 +52,8 @@ pipeline {
             }
         }
 
-        stage('Docker image up') { // run container from our builded image
+        // Run the docker image
+        stage('Docker image up') {
                 steps {
                     script {
                     sh '''
@@ -63,18 +64,6 @@ pipeline {
                     }
                 }
         }
-
-        // stage('Image test') {
-        //     steps {
-        //         script {
-        //             sh ''' 
-        //             curl http://0.0.0.0:5000 | grep -i "200"
-        //             curl http://0.0.0.0:8082 | grep -i "200"
-        //             '''
-        //         }
-        //     }
-        // }
-
 
         stage('Image test') {
             steps {
@@ -91,7 +80,6 @@ pipeline {
                 }
             }
         }
-
 
         // stage('Stop Docker image') {
         //     steps {
