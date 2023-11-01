@@ -3,6 +3,11 @@ environment { // Declaration of environment variables
 DOCKER_ID = "ykadi" // replace this with your docker-id
 DOCKER_IMAGE = "datascientestapi"
 DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
+KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
+DOCKER_PASS = credentials("DOCKER_HUB_PASS")
+AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+AWS_DEFAULT_REGION = "eu-west-3"
 }
 agent any // Jenkins will be able to select all available agents
 stages {
@@ -40,13 +45,7 @@ stages {
 
         }
         stage('Docker Push'){ //we pass the built image to our docker hub account
-            environment
-            {
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
-            }
-
             steps {
-
                 script {
                 sh '''
                 docker login -u $DOCKER_ID -p $DOCKER_PASS
@@ -58,69 +57,61 @@ stages {
         }
 
         stage('Deploiement en dev'){
-                environment
-                {
-                KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS")
-                AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-                AWS_DEFAULT_REGION = "eu-west-3"
-                }
-                    steps {
-                        script {
-                        sh '''
-                        echo "Installation Ingress-controller Nginx"
-                        helm upgrade --install ingress-nginx ingress-nginx \
-	                    --repo https://kubernetes.github.io/ingress-nginx \
-	                    --namespace ingress-nginx --create-namespace     
-                        sleep 10
+            steps {
+                script {
+                    sh '''
+                    echo "Installation Ingress-controller Nginx"
+                    helm upgrade --install ingress-nginx ingress-nginx \
+	                --repo https://kubernetes.github.io/ingress-nginx \
+	                --namespace ingress-nginx --create-namespace     
+                    sleep 10
 
-                        echo "Installation Cert-Manager"
-                        helm upgrade --install cert-manager cert-manager \
-                        --repo https://charts.jetstack.io \
-                        --create-namespace --namespace cert-manager \
-                        --set installCRDs=true
-                        sleep 10
+                    echo "Installation Cert-Manager"
+                    helm upgrade --install cert-manager cert-manager \
+                    --repo https://charts.jetstack.io \
+                    --create-namespace --namespace cert-manager \
+                    --set installCRDs=true
+                    sleep 10
                         
-                        echo "Installation Projet Devops 2023"
-                        sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-                        helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+                    echo "Installation Projet Devops 2023"
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
                         
-                        echo "Installation stack Prometheus-Grafana"
-                        helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
-                        --namespace kube-prometheus-stack --create-namespace \
-                        --repo https://prometheus-community.github.io/helm-charts
-                        '''
-                        }
-                    }
+                    echo "Installation stack Prometheus-Grafana"
+                    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+                    --namespace kube-prometheus-stack --create-namespace \
+                    --repo https://prometheus-community.github.io/helm-charts
+                    '''
+                }
+            }
                     
 
-                }
+        }
+
+        stage('Deploiement en staging') {
+            steps {
+               
+            }
+
+        }
 
         stage('Deploiement en prod'){
-                environment
-                {
-                KUBECONFIG = credentials("EKS-config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-                AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-                AWS_DEFAULT_REGION = "eu-west-3"
+            steps {
+                // Create an Approval Button with a timeout of 15minutes.
+                // this require a manuel validation in order to deploy on production environment
+                timeout(time: 15, unit: "MINUTES") {
+                    input message: 'Do you want to deploy in production ?', ok: 'Yes'
                 }
-                    steps {
-                    // Create an Approval Button with a timeout of 15minutes.
-                    // this require a manuel validation in order to deploy on production environment
-                            timeout(time: 15, unit: "MINUTES") {
-                                input message: 'Do you want to deploy in production ?', ok: 'Yes'
-                            }
 
-                        script {
-                        sh '''
-                         sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                         helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
-                        '''
-                        }
-                    }
-
+                script {
+                    sh '''
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
+                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
+                    '''
                 }
+            }
+
+        }
 
         stage('Prune Docker data') {
                 steps {
