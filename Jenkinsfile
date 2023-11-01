@@ -12,15 +12,15 @@ pipeline {
         // get rid of unused docker data and volumes and network and so on
         // clean kubernetes cluster
         // docker system prune is for spaces reclaimed only
-        stage('Clean stage') {
-                steps {
-                    sh 'docker system prune -a --volumes -f'
-                    sh 'kubectl delete all --all -n default'
-                    sh 'kubectl delete all --all -n dev'
-                    sh 'kubectl delete all --all -n staging'
-                    sh 'kubectl delete all --all -n prod'
-                }
-        }
+        // stage('Clean stage') {
+        //         steps {
+        //             sh 'docker system prune -a --volumes -f'
+        //             sh 'kubectl delete all --all -n default'
+        //             sh 'kubectl delete all --all -n dev'
+        //             sh 'kubectl delete all --all -n staging'
+        //             sh 'kubectl delete all --all -n prod'
+        //         }
+        // }
 
         stage('Cleanup docker containers and images') {
             steps {
