@@ -41,31 +41,6 @@ pipeline {
             }
         }
 
-
-
-        // stage('Docker Build') {
-        //     steps {
-        //         script {
-        //         sh '''
-        //         docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
-        //         sleep 6
-        //         '''
-        //         }
-        //     }
-        // }
-
-        // stage('Docker run') { // run container from our builded image
-        //         steps {
-        //             script {
-        //             sh '''
-        //             docker ps -a | grep -i fastapi && docker rm -f fastapi
-        //             docker run -d -p 5000:5000 --name fastapi $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG
-        //             sleep 10
-        //             '''
-        //             }
-        //         }
-        // }
-
         stage('Docker image build') {
             steps {
                 script {
@@ -89,13 +64,34 @@ pipeline {
                 }
         }
 
-        stage('Test Acceptance') {
+        // stage('Image test') {
+        //     steps {
+        //         script {
+        //             sh ''' 
+        //             curl http://0.0.0.0:5000 | grep -i "200"
+        //             curl http://0.0.0.0:8082 | grep -i "200"
+        //             '''
+        //         }
+        //     }
+        // }
+
+
+        stage('Image test') {
             steps {
                 script {
-                    sh 'curl http://0.0.0.0:5000'
+                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
+                    def pdagmin = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
+
+                    if (fastapiStatus == 200 && pdagmin == 200) {
+                        echo "Fast api and pdagmin are running fine"
+                        
+                    } else {
+                        error("Fast api or pgadmin is not working, check pipeline log to see which one failed")
+                    }
                 }
             }
         }
+
 
         // stage('Stop Docker image') {
         //     steps {
