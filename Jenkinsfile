@@ -85,10 +85,11 @@ pipeline {
             steps {
                 script {
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
-                    def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
+                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
                     
-                    // if ((fastapiStatus == 200) && (pdagminStatus == 200 || pdagminStatus == 302)) {
-                    if (pdagminStatus == 302) {
+                    sh '''echo "my pgadminStatus is ${pgadminStatus}"'''
+                    // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
+                    if (pgadminStatus == 302) {
                         echo "Fast API and PgAdmin are running fine"
                     } else {
                         error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
