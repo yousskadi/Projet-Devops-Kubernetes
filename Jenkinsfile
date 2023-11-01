@@ -84,8 +84,8 @@ pipeline {
         stage('Image test') {
             steps {
                 script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true, returnStdout: true).trim()
-                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true).trim()
+                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true, returnStdout: true)
+                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
                     
                     echo "my pgadminStatus is ${pgadminStatus}"
                     // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
