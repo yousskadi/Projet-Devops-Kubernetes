@@ -90,10 +90,23 @@ stages {
 
         stage('Deploiement en staging') {
             steps {
-               
+               script {
+                    sh '''
+                    curl -i -i 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                    if curl -i 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
+                        echo "La chaîne 'toto' a été trouvée dans la réponse."
+                    else
+                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
+                    fi'''
+                    def code_retour = sh '''curl -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"''' 
+                    def count = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
+                    
+                    if (code_retour == 200 ) {
+                        echo $count
+                    } else {
+                        error("pas de retour de l'api")
+                    }    
             }
-
-        }
 
         stage('Deploiement en prod'){
             steps {
