@@ -41,6 +41,7 @@ agent any
                 script {
                      
                         sh 'cd local-test'
+                        sh 'pwd'
                         sh 'docker-compose build'
                         sh 'sleep 6'
                     
