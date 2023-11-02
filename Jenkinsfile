@@ -11,26 +11,7 @@ pipeline {
 }
 
 agent any 
-    stages {
-        stage('Cleanup docker containers and images') {
-            steps {
-                script {          
-                    sh '''
-		docker ps -a | grep -i pgadmin && docker rm -f pgadmin
-		docker ps -a | grep -i db && docker rm -f db
-		docker ps -a | grep -i projet-kubernet-fastapi_fastapi_1 && docker rm -f projet-kubernet-fastapi_fastapi_1
-		
-		 docker rmi -f $(docker images -q) 2> /dev/null
-        
-		docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml build
-		 sleep 6
-		
-                        '''
-                }
-            }
-        }
-
-        /*
+    stages { 
         stage('Cleanup docker containers and images') {
             steps {
                 script {
@@ -67,7 +48,6 @@ agent any
                 }
             }
         }
-*/
         // Run the docker image
         stage('Docker image up') {
                 steps {
