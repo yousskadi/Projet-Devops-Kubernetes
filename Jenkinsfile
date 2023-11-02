@@ -47,14 +47,13 @@ agent any
         // Run the docker image
         stage('Docker image up') {
                 steps {
-                    script {
-                    sh '''
-                    docker ps
-                    local-test/ docker-compose up -d
-                    sleep 10
-                    '''
+                script {
+                    dir('local-test/') {
+                        sh 'docker-compose up'
+                        sh 'sleep 10'
                     }
                 }
+            }
         }
         
       stage('Image test') {
