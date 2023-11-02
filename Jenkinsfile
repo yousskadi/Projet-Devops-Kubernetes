@@ -37,7 +37,7 @@ agent any
             steps {
                 script {
                 sh '''
-                docker-compose build
+                local-test/ docker-compose build
                 sleep 6
                 '''
                 }
@@ -50,7 +50,7 @@ agent any
                     script {
                     sh '''
                     docker ps
-                    docker-compose up -d
+                    local-test/ docker-compose up -d
                     sleep 10
                     '''
                     }
