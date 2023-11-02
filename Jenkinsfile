@@ -20,7 +20,7 @@ agent any
                     // echo "Display runningContainers: ${runningContainers}"
                     // if (runningContainers == 0) {
                     sh '''
-                    if docker ps | grep -q "CONTAINER ID"; then 
+                    if docker ps -q 2>/dev/null; then 
                         docker system prune -a --volumes -f
                         docker stop $(docker ps -aq)
                         docker rm $(docker ps -aq)
