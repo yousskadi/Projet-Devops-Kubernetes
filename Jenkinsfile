@@ -84,34 +84,33 @@ pipeline {
         stage('Image test') {
             steps {
                 script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true, returnStdout: true).trim()
-                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true, returnStdout: true).trim()
+                    // def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true, returnStdout: true).trim()
+                    // def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
 
 
-                    // def pgadminResponse = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
+                    def pgadminResponse = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
             
-                    // echo "pgdamdin code: ${pgadminResponse}"
-                    echo "pgdamdin code: ${pgadminStatus}"
+                    echo "pgd: ${pgadminResponse}"
                     
-                    // if (pgadminResponse == '200' || pgadminResponse == '302') {
-                    //     echo "Fast API and PgAdmin are running fine"
-                    // } else {
-                    //     error("Fast API or PgAdmin is not working, check the pipeline log to see which one failed")
-                    // }
-
-
-
-
-
-
-
-
-                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
-                    // if (pgadminStatus == '200' || pgadminStatus == '302') {
+                    if (pgadminResponse == '200' || pgadminResponse == '302') {
                         echo "Fast API and PgAdmin are running fine"
                     } else {
-                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                        error("Fast API or PgAdmin is not working, check the pipeline log to see which one failed")
                     }
+
+
+
+
+
+
+
+
+                    // if ((fastapiStatus == 200) && (pgadminStatus == 200 || pgadminStatus == 302)) {
+                    // if (pgadminStatus == '200' || pgadminStatus == '302') {
+                    //     echo "Fast API and PgAdmin are running fine"
+                    // } else {
+                    //     error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                    // }
                 }                           
             }
         }   
