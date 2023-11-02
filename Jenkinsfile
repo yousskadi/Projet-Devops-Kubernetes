@@ -42,7 +42,7 @@ agent any
                      
                         // sh 'cd local-test'
                         sh 'pwd'
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/ build'
+                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml build'
                         sh 'sleep 6'
                     
                 }
@@ -54,7 +54,7 @@ agent any
                 steps {
                 script {
                          sh 'cd local-test'
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/ up'
+                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml up'
                         // sh ' cd .. '
                         sh 'sleep 10'
                         
