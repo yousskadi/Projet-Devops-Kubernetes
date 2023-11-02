@@ -42,7 +42,7 @@ agent any
                      
                         // sh 'cd local-test'
                         sh 'pwd'
-                        sh 'docker-compose -f local-test/ build'
+                        sh 'docker-compose -f/var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml build'
                         sh 'sleep 6'
                     
                 }
