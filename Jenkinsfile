@@ -16,8 +16,8 @@ agent any
             steps {
                 script {
                     
-                    def runningContainers = sh(script: 'docker ps', returnStatus: true)
-                    if (runningContainers == 0) {
+                    def runningContainers = sh(script: 'docker ps -q', returnStatus: true)
+                    if (runningContainers.returnStatus == 0) {
                         echo "No running containers found."
                     } else {
                         sh 'docker system prune -a --volumes -f'
