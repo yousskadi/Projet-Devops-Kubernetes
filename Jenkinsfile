@@ -65,41 +65,48 @@ pipeline {
         //         }
         // }
 
+
         // stage('Image test') {
         //     steps {
         //         script {
-        //             def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
-        //             def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
+        //             def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+        //             def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
-        //             if (fastapiStatus == 200 && pdagminStatus == 200 || pdagminStatus == 302 ) {
-        //                 echo "Fast api and pdagmin are running fine"
+        //             echo "Display fastapiStatus: ${fastapiStatus}"
+        //             echo "Display fastapiStatus: ${pgadminStatus}"
                         
+        //             if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
+        //                 echo "Fast API and PgAdmin are running fine"
         //             } else {
-        //                 error("Fast api or pgadmin is not working, check pipeline log to see which one failed")
+        //                 error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
         //             }
-        //         }
+        //         }                           
         //     }
-        // }
+        // }   
 
-        stage('Image test') {
+         stage('Staging deployment') {
             steps {
                 script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
-                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
+                    
+                    // curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "TTT", "email": "TTT@email.com","password": "passwordTTT"}' https://www.devops-youss.cloudns.ph
+                    // if curl -i -X GET -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 | grep -qF "toto"; then
+                    //     echo "La chaîne 'toto' a été trouvée dans la réponse."
+                    // else
+                    //     echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
+                    // fi'''
 
-                    echo "Display fastapiStatus: ${fastapiStatus}"
-                    echo "Display fastapiStatus: ${pgadminStatus}"
-                        
-                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
-                        echo "Fast API and PgAdmin are running fine"
+
+                    def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
+                    echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
+
+                    if ((endpointCountUsersStatus == '200')) {
+                        echo "Endpoint count on users is working fine"
                     } else {
-                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                        error("Endpoint error on users, please check pipeline log to see which one failed")
                     }
-                }                           
+                }
             }
-        }   
-
-
+        }
 
 
         // stage('Stop Docker image') {
