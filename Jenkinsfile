@@ -18,13 +18,13 @@ agent any
                     
                     def runningContainers = sh(script: 'docker ps', returnStatus: true)
                     echo "Display runningContainers: ${runningContainers}"
-                    if (runningContainers == 0) {
-                        echo "No running containers found."
-                    } else {
+                    if (runningContainers == 0) {   
                         sh 'docker system prune -a --volumes -f'
                         sh 'docker stop $(docker ps -aq)'
                         sh 'docker rm $(docker ps -aq)'
                         sh 'docker rmi -f $(docker images -q)'
+                    } else {
+                        echo "No running containers found."
                     }
                     sh 'docker ps'
                     sh 'docker images'
