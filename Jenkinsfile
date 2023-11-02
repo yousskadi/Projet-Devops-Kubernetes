@@ -67,23 +67,24 @@ agent any
             }
         }
        
-        stage('Image test') {
+      stage('Image test') {
             steps {
                 script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStatus: true)
-                    def pdagminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true)
+                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
-                    //if (fastapiStatus == 0 && pdagminStatus == 0 || pdagminStatus == 302 ) {
-                    if (pdagminStatus == 302 ) {
-                        echo "Fast api and pdagmin are running fine"
+                    echo "Display fastapiStatus: ${fastapiStatus}"
+                    echo "Display pgadminStatus: ${pgadminStatus}"
                         
+                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
+                        echo "Fast API and PgAdmin are running fine"
                     } else {
-                        error("Fast api or pgadmin is not working, check pipeline log to see which one failed")
+                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
                     }
-                }
+                }                           
             }
-        }
-
+        } 
+        
         // Push the docker image built on dockerhub
         stage('Docker Push') { 
             steps {
@@ -96,7 +97,7 @@ agent any
             }
         }
 
-        stage('Local deployment') {
+        stage('Dev deployment') {
             steps {
                 script {
                     sh '''
@@ -137,16 +138,19 @@ agent any
                         echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
                     fi'''
                     def code_retour = sh(script: 'curl -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"', returnStatus: true) 
-                    def count_return = sh(script: "curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1", returnStdout: true)                    
+                    // def count_return = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
+                    def count_return = sh(script: "curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1", returnStdout: true).trim()
+                    
+
                     if (code_retour == 200 ) {
                         echo $count_return
                     } else {
-                        error("pas de retour de l'api")
-                    }    
+                        error("Endpoint error on users, please check pipeline log to see which one failed")
+                    }
                 }
             }
         }
-
+        
         stage('Production deployment') {
             steps {
                 // Create an Approval Button with a timeout of 15minutes.
@@ -163,12 +167,7 @@ agent any
             }
         }
 
-        stage('Prune Docker data') {
-                steps {
-                    sh 'docker system prune -a --volumes -f'
-                }
-
-        }
+        
     }
     
     post { // send email when the job has failed
