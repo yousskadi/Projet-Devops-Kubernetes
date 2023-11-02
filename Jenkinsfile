@@ -52,9 +52,9 @@ agent any
         stage('Docker image up') {
                 steps {
                 script {
-                     
+                         sh 'cd local-test'
                         sh 'docker-compose up'
-                        sh ' cd .. '
+                        // sh ' cd .. '
                         sh 'sleep 10'
                         
                 }
