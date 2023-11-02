@@ -22,15 +22,14 @@ agent any
                     sh '''
                     docker ps > docker_ps_test
 
-                    if [ -s "docker_ps_test" ]; then
+                    if grep -q 'NAMES[^[:space:]]' docker_ps_test; then
                         docker system prune -a --volumes -f
                         docker stop $(docker ps -aq)
                         docker rm $(docker ps -aq)
                         docker rmi -f $(docker images -q)
                     else
                         echo "No running containers found."
-                     fi
-                    // if [ -n "$(docker ps -q)" ]; then
+                    fi
                     '''
                 }
             }
