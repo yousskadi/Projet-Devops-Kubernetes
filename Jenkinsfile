@@ -36,10 +36,10 @@ agent any
         stage('Docker image build') {
             steps {
                 script {
-                sh '''
-                local-test/ docker-compose build
-                sleep 6
-                '''
+                    dir('local-test/') {
+                        sh 'docker-compose build'
+                        sh 'sleep 6'
+                    }
                 }
             }
         }
