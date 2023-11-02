@@ -12,7 +12,7 @@ pipeline {
 
 agent any 
     stages {
-        stage('Cleanup docker containers and images') {
+      /*  stage('Cleanup docker containers and images') {
             steps {
                 script {
                     
@@ -48,7 +48,7 @@ agent any
                 }
             }
         }
-
+*/
         // Run the docker image
         stage('Docker image up') {
                 steps {
