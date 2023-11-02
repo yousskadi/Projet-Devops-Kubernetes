@@ -84,7 +84,7 @@ pipeline {
             }
         }   
 
-         stage('Staging deployment') {
+        stage('Staging deployment') {
             steps {
                 script {
                     def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
@@ -98,8 +98,7 @@ pipeline {
                 }
             }
         }
-
-
+   
         // stage('Stop Docker image') {
         //     steps {
         //         script {
