@@ -162,18 +162,18 @@ agent any
         
     }
     
-    post { // send email when the job has failed
-        success {
-            script {
-                slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-            }
-        }
+    // post {
+    //     success {
+    //         script {
+    //             slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+    //         }
+    //     }
         
-        failure {
-            script {
-                slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-            }
-        }
+    //     failure {
+    //         script {
+    //             slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+    //         }
+    //     }
         // ..
         /*
         failure {
