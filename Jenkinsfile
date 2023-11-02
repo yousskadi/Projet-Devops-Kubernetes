@@ -40,9 +40,9 @@ agent any
             steps {
                 script {
                      
-                        sh 'cd local-test'
+                        // sh 'cd local-test'
                         sh 'pwd'
-                        sh 'docker-compose build'
+                        sh 'docker-compose -f local-test/ build'
                         sh 'sleep 6'
                     
                 }
@@ -54,7 +54,7 @@ agent any
                 steps {
                 script {
                          sh 'cd local-test'
-                        sh 'docker-compose up -d'
+                        sh 'docker-compose -f local-test/ up'
                         // sh ' cd .. '
                         sh 'sleep 10'
                         
