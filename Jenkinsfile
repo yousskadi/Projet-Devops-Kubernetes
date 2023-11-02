@@ -20,6 +20,7 @@ agent any
                     // echo "Display runningContainers: ${runningContainers}"
                     // if (runningContainers == 0) {
                     sh '''
+                    echo $(docker ps -q)
                     if [ -n "$(docker ps -q)" ]; then
                         echo "No running containers found."
                     else
