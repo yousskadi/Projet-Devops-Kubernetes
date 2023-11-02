@@ -19,7 +19,7 @@ agent any
                     def runningContainers = sh(script: 'docker ps', returnStdout: true).trim()
                     echo "Display runningContainers: ${runningContainers}"
                     // if (runningContainers == 0) {
-                    if (runningContainers.isEmpty()) {
+                    if (runningContainers == '') {
                         echo "No running containers found."
                     } else {
                         sh 'docker system prune -a --volumes -f'
