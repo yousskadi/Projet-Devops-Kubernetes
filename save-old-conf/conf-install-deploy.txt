@@ -42,3 +42,15 @@ kubectl get secrets --namespace kube-prometheus-stack
 kubectl get secret --namespace kube-prometheus-stack \
 kube-prometheus-stack-grafana -o json | jq '.data | map_values(@base64d)'
 	
+
+
+### Test BD insertion
+
+
+
+INSERT INTO users ("id", "name", "email", "password") VALUES
+  (5, 'Nina', 'nina@example.com', 'password'),
+  (1, 'Benjamin', 'benjamin@example.com', 'password'),
+  (2, 'Faycal', 'faycal@example.com', 'password'),
+  (3, 'Nawfal', 'nawfal@example.com', 'password'),
+  (4, 'Fall', 'fall@example.com', 'password');
