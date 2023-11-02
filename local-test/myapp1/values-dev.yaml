@@ -1,0 +1,11 @@
+appName: pgadmin-dev
+
+fastapiName: fastapi-dev
+
+namespace: dev
+
+pvcName: postgres-pv-claim-dev
+
+storageClassName: stclassname-dev
+
+pvName: postgres-pv-dev
