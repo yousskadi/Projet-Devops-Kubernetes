@@ -16,7 +16,7 @@ agent any
             steps {
                 script {
                     
-                    def runningContainers = sh(script: 'docker ps -q', returnStatus: true)
+                    def runningContainers = sh(script: 'docker ps', returnStatus: true)
                     if (runningContainers == 0) {
                         echo "No running containers found."
                     } else {
