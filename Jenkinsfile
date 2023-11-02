@@ -20,19 +20,14 @@ agent any
                     // echo "Display runningContainers: ${runningContainers}"
                     // if (runningContainers == 0) {
                     sh '''
-                    if docker ps -q 2>/dev/null; then 
+                    if [ -n "$(docker ps -q)" ]; then
+                        echo "No running containers found."
+                    else
                         docker system prune -a --volumes -f
                         docker stop $(docker ps -aq)
                         docker rm $(docker ps -aq)
                         docker rmi -f $(docker images -q)
-                    else 
-                        echo "No running containers found."
-                    
-                         
-                    fi
-                    
-                    docker ps
-                    docker images
+                        fi
                     '''
                 }
             }
