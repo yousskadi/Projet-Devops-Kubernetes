@@ -16,17 +16,17 @@ agent any
             steps {
                 script {
                     
-                    def runningContainers = sh(script: 'docker ps', returnStdout: true).trim()
-                    echo "Display runningContainers: ${runningContainers}"
+                    
+                    // echo "Display runningContainers: ${runningContainers}"
                     // if (runningContainers == 0) {
-                    if (runningContainers == '') {
+                    if docker ps | grep -q "CONTAINER ID"; then 
                         echo "No running containers found."
-                    } else {
+                    else 
                         sh 'docker system prune -a --volumes -f'
                         sh 'docker stop $(docker ps -aq)'
                         sh 'docker rm $(docker ps -aq)'
                         sh 'docker rmi -f $(docker images -q)'
-                    }
+                    fi
                     sh 'docker ps'
                     sh 'docker images'
                 }
