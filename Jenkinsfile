@@ -21,12 +21,13 @@ agent any
                     // if (runningContainers == 0) {
                     sh '''
                     if docker ps | grep -q "CONTAINER ID"; then 
-                        echo "No running containers found."
-                    else 
                         docker system prune -a --volumes -f
                         docker stop $(docker ps -aq)
                         docker rm $(docker ps -aq)
                         docker rmi -f $(docker images -q)
+                        
+                    else 
+                        echo "No running containers found."
                     fi
                     
                     docker ps
