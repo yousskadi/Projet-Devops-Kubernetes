@@ -53,7 +53,7 @@ agent any
                 steps {
                 script {
                          sh 'cd local-test'
-                        sh 'docker-compose up'
+                        sh 'docker-compose up -d'
                         // sh ' cd .. '
                         sh 'sleep 10'
                         
