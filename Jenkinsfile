@@ -31,7 +31,7 @@ agent any
                     
                     docker ps
                     docker images
-                    sh'''
+                    '''
                 }
             }
         }
