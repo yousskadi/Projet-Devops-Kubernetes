@@ -53,7 +53,6 @@ agent any
         stage('Docker image up') {
                 steps {
                 script {
-                         sh 'cd local-test'
                         sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml up'
                         // sh ' cd .. '
                         sh 'sleep 10'
