@@ -87,15 +87,6 @@ pipeline {
          stage('Staging deployment') {
             steps {
                 script {
-                    
-                    // curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "TTT", "email": "TTT@email.com","password": "passwordTTT"}' https://www.devops-youss.cloudns.ph
-                    // if curl -i -X GET -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 | grep -qF "toto"; then
-                    //     echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    // else
-                    //     echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    // fi'''
-
-
                     def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
                     echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
 
