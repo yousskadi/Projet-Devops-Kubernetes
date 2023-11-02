@@ -56,18 +56,7 @@ agent any
                     }
                 }
         }
-
-        stage('Build and tag docker image for dockerhub') {
-            steps {
-                script {
-                sh '''
-                docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
-                sleep 6
-                '''
-                }
-            }
-        }
-       
+        
       stage('Image test') {
             steps {
                 script {
@@ -85,6 +74,17 @@ agent any
                 }                           
             }
         } 
+
+        stage('Build and tag docker image for dockerhub') {
+            steps {
+                script {
+                sh '''
+                docker build -t $DOCKER_ID/$DOCKER_IMAGE:$DOCKER_TAG .
+                sleep 6
+                '''
+                }
+            }
+        }
         
         // Push the docker image built on dockerhub
         stage('Docker Push') { 
