@@ -66,23 +66,23 @@ pipeline {
         // }
 
 
-        // stage('Image test') {
-        //     steps {
-        //         script {
-        //             def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
-        //             def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
+        stage('Image test') {
+            steps {
+                script {
+                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
-        //             echo "Display fastapiStatus: ${fastapiStatus}"
-        //             echo "Display fastapiStatus: ${pgadminStatus}"
+                    echo "Display fastapiStatus: ${fastapiStatus}"
+                    echo "Display fastapiStatus: ${pgadminStatus}"
                         
-        //             if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
-        //                 echo "Fast API and PgAdmin are running fine"
-        //             } else {
-        //                 error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
-        //             }
-        //         }                           
-        //     }
-        // }   
+                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
+                        echo "Fast API and PgAdmin are running fine"
+                    } else {
+                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                    }
+                }                           
+            }
+        }   
 
          stage('Staging deployment') {
             steps {
