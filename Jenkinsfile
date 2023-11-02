@@ -86,11 +86,10 @@ pipeline {
                 script {
                     def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
                     // def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStatus: true, returnStdout: true)
-
-
                     def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
             
-                    echo "pgd: ${pgadminStatus}"
+                    echo "Display fastapiStatus: ${fastapiStatus}"
+                    echo "Display fastapiStatus: ${pgadminStatus}"
                     
                     // if (pgadminResponse == '200' || pgadminResponse == '302') {
                     //     echo "Fast API and PgAdmin are running fine"
