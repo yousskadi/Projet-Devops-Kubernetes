@@ -30,8 +30,8 @@ agent any
                     else
                         echo "No running containers found."
                       '''                
-                  */  fi
-
+                   fi
+                    */ 
                         sh '''
                         docker system prune -a --volumes -f
                         docker ps -a | grep -i pgadmin && docker rm -f pgadmin
