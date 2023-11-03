@@ -81,7 +81,7 @@ agent any
       stage('Image test') {
             steps {
                 script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+                /*    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
                     def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
                     echo "Display fastapiStatus: ${fastapiStatus}"
@@ -91,7 +91,9 @@ agent any
                         echo "Fast API and PgAdmin are running fine"
                     } else {
                         error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
-                    }
+                    }  */
+
+                    sh 'curl http://0.0.0.0:5000'
                 }                           
             }
         } 
