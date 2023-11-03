@@ -16,7 +16,8 @@ agent any
             steps {
                 script {   
                  
-                        sh'''                    
+                        sh'''    
+                         echo $(docker ps -q)
                          if [[ $(docker ps -q) ]]; then
                             echo "Running containers found. Cleaning up..."
                             docker stop $(docker ps -aq)
