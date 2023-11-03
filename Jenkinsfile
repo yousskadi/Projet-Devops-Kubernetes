@@ -38,7 +38,6 @@ agent any
                         docker ps -a | grep -i db && docker rm -f db
                         docker ps -a | grep -i local-test_fastapi_1 && docker rm -f local-test_fastapi_1
                         
-                        # docker rmi -f $(docker images -q) 2> /dev/null
                   
                         '''
                 }
