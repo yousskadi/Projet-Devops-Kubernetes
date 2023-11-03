@@ -104,15 +104,18 @@ agent any
                     --create-namespace --namespace cert-manager \
                     --set installCRDs=true
                     sleep 10
-                        
-                    echo "Installation Projet Devops 2023"
-                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
-                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
-                        
+                    
                     echo "Installation stack Prometheus-Grafana"
                     helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
                     --namespace kube-prometheus-stack --create-namespace \
                     --repo https://prometheus-community.github.io/helm-charts
+
+
+                    echo "Installation Projet Devops 2023"
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
+                    helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
+                        
+                    
                     '''
                 }
             }           
