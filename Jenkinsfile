@@ -142,7 +142,7 @@ agent any
                 script {
                     sh '''
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
+                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace --set ingress-grafana=false
                     '''
                 }
             }
