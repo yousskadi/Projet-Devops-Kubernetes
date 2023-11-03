@@ -19,8 +19,8 @@ agent any
                     
                     // echo "Display runningContainers: ${runningContainers}"
                     // if (runningContainers == 0) {
-                    sh '''
-                /*    docker ps > docker_ps_test
+                /*    sh '''
+                    docker ps > docker_ps_test
 
                     if grep -q 'NAMES[^[:space:]]' docker_ps_test; then
                         docker system prune -a --volumes -f
@@ -29,8 +29,10 @@ agent any
                         docker rmi -f $(docker images -q)
                     else
                         echo "No running containers found."
+                      '''                
                   */  fi
-                  
+
+                        sh '''
                         docker system prune -a --volumes -f
                         docker ps -a | grep -i pgadmin && docker rm -f pgadmin
                         docker ps -a | grep -i db && docker rm -f db
@@ -38,7 +40,7 @@ agent any
                         
                         docker rmi -f $(docker images -q) 2> /dev/null
                   
-                    '''
+                        '''
                 }
             }
         }
