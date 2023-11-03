@@ -36,7 +36,7 @@ agent any
                         docker system prune -a --volumes -f
                         docker ps -a | grep -i pgadmin && docker rm -f pgadmin
                         docker ps -a | grep -i db && docker rm -f db
-                        docker ps -a | grep -i projet-kubernet-fastapi_fastapi_1 && docker rm -f projet-kubernet-fastapi_fastapi_1
+                        docker ps -a | grep -i local-test_fastapi_1 && docker rm -f local-test_fastapi_1
                         
                         docker rmi -f $(docker images -q) 2> /dev/null
                   
