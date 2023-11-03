@@ -14,31 +14,8 @@ agent any
     stages { 
         stage('Cleanup docker containers and images') {
             steps {
-                script {
-                    
-                    
-                    // echo "Display runningContainers: ${runningContainers}"
-                    // if (runningContainers == 0) {
-                /*    sh '''
-                    docker ps > docker_ps_test
-
-                    if grep -q 'NAMES[^[:space:]]' docker_ps_test; then
-                        docker system prune -a --volumes -f
-                        docker stop $(docker ps -aq)
-                        docker rm $(docker ps -aq)
-                        docker rmi -f $(docker images -q)
-                    else
-                        echo "No running containers found."
-                      '''                
-                   fi
-                     
-                        sh '''
-                        docker system prune -a --volumes -f
-                        docker ps -a | grep -i pgadmin && docker rm -f pgadmin
-                        docker ps -a | grep -i db && docker rm -f db
-                        docker ps -a | grep -i local-test_fastapi_1 && docker rm -f local-test_fastapi_1
-                        '''
-                        */
+                script {   
+                 
                         sh'''                    
                          if [[ $(docker ps -q) ]]; then
                             echo "Running containers found. Cleaning up..."
