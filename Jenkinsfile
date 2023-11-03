@@ -58,17 +58,6 @@ agent any
       stage('Image test') {
             steps {
                 script {
-                /*    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
-                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
-
-                    echo "Display fastapiStatus: ${fastapiStatus}"
-                    echo "Display pgadminStatus: ${pgadminStatus}"
-                        
-                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
-                        echo "Fast API and PgAdmin are running fine"
-                    } else {
-                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
-                    }  */
 
                     sh 'curl http://0.0.0.0:5000'
                 }                           
@@ -162,18 +151,18 @@ agent any
         
     }
     
-    // post {
-    //     success {
-    //         script {
-    //             slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-    //         }
-    //     }
+     post {
+         success {
+             script {
+                 slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+             }
+         }
         
-    //     failure {
-    //         script {
-    //             slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-    //         }
-    //     }
+        failure {
+             script {
+                 slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+           }
+        }
     //     // ..
         
     //     failure {
