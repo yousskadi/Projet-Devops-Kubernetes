@@ -10,7 +10,7 @@ Déployement de nouveaux micro services qui permettront l'enregistrement et le d
 
     - un dernier service qui déploie PGAdmin qui est un est l'interface d'administration afin de gérer vos bases de données.
 
-L'application sera déployer sur EKS.
+L'application sera déployer sur EKS .
 
 
 #EKS link:
