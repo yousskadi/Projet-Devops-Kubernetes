@@ -11,21 +11,23 @@ pipeline {
 }
 
 agent any 
-    stages { 
+    stages {
         stage('Cleanup docker containers and images') {
             steps {
-                script {   
-                 
-                        sh'''                    
-                         if [[ $(docker ps -q) ]]; then
-                            echo "Running containers found. Cleaning up..."
-                            docker stop $(docker ps -aq)
-                            docker rm $(docker ps -aq)
-                            docker rmi -f $(docker images -q)
-                        else
-                            echo "No running containers found."
-                        fi  
-                        '''
+                script {
+                    
+                    def runningContainers = sh(script: 'docker ps', returnStatus: true)
+                    echo "Display runningContainers: ${runningContainers}"
+                    if (runningContainers == 0) {   
+                        sh 'docker system prune -a --volumes -f'
+                        sh 'docker stop $(docker ps -aq)'
+                        sh 'docker rm $(docker ps -aq)'
+                        sh 'docker rmi -f $(docker images -q)'
+                    } else {
+                        echo "No running containers found."
+                    }
+                    sh 'docker ps'
+                    sh 'docker images'
                 }
             }
         }
@@ -34,32 +36,41 @@ agent any
         stage('Docker image build') {
             steps {
                 script {
-                     
-                        // sh 'cd local-test'
-                        sh 'pwd'
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml build'
-                        sh 'sleep 6'
-                    
+                sh '''
+                docker-compose build
+                sleep 6
+                '''
                 }
             }
         }
+
         // Run the docker image
         stage('Docker image up') {
                 steps {
-                script {
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml up -d'
-                        // sh ' cd .. '
-                        sh 'sleep 10'
-                        
+                    script {
+                    sh '''
+                    docker ps
+                    docker-compose up -d
+                    sleep 10
+                    '''
+                    }
                 }
-            }
         }
         
       stage('Image test') {
             steps {
                 script {
+                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
-                    sh 'curl http://0.0.0.0:5000'
+                    echo "Display fastapiStatus: ${fastapiStatus}"
+                    echo "Display pgadminStatus: ${pgadminStatus}"
+                        
+                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
+                        echo "Fast API and PgAdmin are running fine"
+                    } else {
+                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                    }
                 }                           
             }
         } 
@@ -151,18 +162,18 @@ agent any
         
     }
     
-     post {
-         success {
-             script {
-                 slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-             }
-         }
+    // post {
+    //     success {
+    //         script {
+    //             slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+    //         }
+    //     }
         
-        failure {
-             script {
-                 slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-           }
-        }
+    //     failure {
+    //         script {
+    //             slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+    //         }
+    //     }
     //     // ..
         
     //     failure {
@@ -175,4 +186,4 @@ agent any
     //     // ..
     // }
 }
-}
+
