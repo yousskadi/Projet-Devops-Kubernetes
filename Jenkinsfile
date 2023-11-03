@@ -31,12 +31,23 @@ agent any
                         echo "No running containers found."
                       '''                
                    fi
-                    */ 
+                     
                         sh '''
                         docker system prune -a --volumes -f
                         docker ps -a | grep -i pgadmin && docker rm -f pgadmin
                         docker ps -a | grep -i db && docker rm -f db
                         docker ps -a | grep -i local-test_fastapi_1 && docker rm -f local-test_fastapi_1
+                        '''
+                        */
+                        sh'''                    
+                         if [[ $(docker ps -q) ]]; then
+                            echo "Running containers found. Cleaning up..."
+                            docker stop $(docker ps -aq)
+                            docker rm $(docker ps -aq)
+                            docker rmi -f $(docker images -q)
+                        else
+                            echo "No running containers found."
+                        fi  
                         '''
                 }
             }
