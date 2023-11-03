@@ -37,8 +37,6 @@ agent any
                         docker ps -a | grep -i pgadmin && docker rm -f pgadmin
                         docker ps -a | grep -i db && docker rm -f db
                         docker ps -a | grep -i local-test_fastapi_1 && docker rm -f local-test_fastapi_1
-                        
-                  
                         '''
                 }
             }
