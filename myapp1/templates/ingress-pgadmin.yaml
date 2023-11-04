@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   generation: 2
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuerNameDev }}
+    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuerNameProd }}
     #nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   tls:
