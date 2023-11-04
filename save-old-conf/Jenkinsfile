@@ -11,22 +11,23 @@ pipeline {
 }
 
 agent any 
-    stages { 
+    stages {
         stage('Cleanup docker containers and images') {
             steps {
-                script {   
-                 
-                        sh'''    
-                         echo $(docker ps -q)
-                         if [[ $(docker ps -q) ]]; then
-                            echo "Running containers found. Cleaning up..."
-                            docker stop $(docker ps -aq)
-                            docker rm $(docker ps -aq)
-                            docker rmi -f $(docker images -q)
-                        else
-                            echo "No running containers found."
-                        fi  
-                        '''
+                script {
+                    
+                    def runningContainers = sh(script: 'docker ps', returnStatus: true)
+                    echo "Display runningContainers: ${runningContainers}"
+                    if (runningContainers == 0) {   
+                        sh 'docker system prune -a --volumes -f'
+                        sh 'docker stop $(docker ps -aq)'
+                        sh 'docker rm $(docker ps -aq)'
+                        sh 'docker rmi -f $(docker images -q)'
+                    } else {
+                        echo "No running containers found."
+                    }
+                    sh 'docker ps'
+                    sh 'docker images'
                 }
             }
         }
@@ -35,32 +36,41 @@ agent any
         stage('Docker image build') {
             steps {
                 script {
-                     
-                        // sh 'cd local-test'
-                        sh 'pwd'
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml build'
-                        sh 'sleep 6'
-                    
+                sh '''
+                docker-compose build
+                sleep 6
+                '''
                 }
             }
         }
+
         // Run the docker image
         stage('Docker image up') {
                 steps {
-                script {
-                        sh 'docker-compose -f /var/lib/jenkins/workspace/Projet-Kubernet-FastAPI/local-test/docker-compose.yml up -d'
-                        // sh ' cd .. '
-                        sh 'sleep 10'
-                        
+                    script {
+                    sh '''
+                    docker ps
+                    docker-compose up -d
+                    sleep 10
+                    '''
+                    }
                 }
-            }
         }
         
       stage('Image test') {
             steps {
                 script {
+                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
-                    sh 'curl http://0.0.0.0:5000'
+                    echo "Display fastapiStatus: ${fastapiStatus}"
+                    echo "Display pgadminStatus: ${pgadminStatus}"
+                        
+                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
+                        echo "Fast API and PgAdmin are running fine"
+                    } else {
+                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+                    }
                 }                           
             }
         } 
@@ -104,18 +114,15 @@ agent any
                     --create-namespace --namespace cert-manager \
                     --set installCRDs=true
                     sleep 10
-                    
-                    echo "Installation stack Prometheus-Grafana"
-                    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
-                    --namespace kube-prometheus-stack --create-namespace \
-                    --repo https://prometheus-community.github.io/helm-charts
-
-
+                        
                     echo "Installation Projet Devops 2023"
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                     helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
                         
-                    
+                    echo "Installation stack Prometheus-Grafana"
+                    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
+                    --namespace kube-prometheus-stack --create-namespace \
+                    --repo https://prometheus-community.github.io/helm-charts
                     '''
                 }
             }           
@@ -124,20 +131,11 @@ agent any
         stage('Staging deployment') {
             steps {
                 script {
-                    sh '''
-                    curl -i -i 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
-                    if curl -i 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
-                        echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    else
-                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    fi'''
-                    def code_retour = sh(script: 'curl -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"', returnStatus: true) 
-                    // def count_return = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
-                    def count_return = sh(script: "curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1", returnStdout: true).trim()
-                    
+                    def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
+                    echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
 
-                    if (code_retour == 200 ) {
-                        echo $count_return
+                    if ((endpointCountUsersStatus == '200')) {
+                        echo "Endpoint count on users is working fine"
                     } else {
                         error("Endpoint error on users, please check pipeline log to see which one failed")
                     }
@@ -155,7 +153,7 @@ agent any
                 script {
                     sh '''
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
-                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace --set ingress-grafana=false
+                    helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
                     '''
                 }
             }
@@ -164,18 +162,18 @@ agent any
         
     }
     
-     post {
-         success {
-             script {
-                 slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-             }
-         }
+    // post {
+    //     success {
+    //         script {
+    //             slackSend botUser: true, color: 'good', message: "Successful :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+    //         }
+    //     }
         
-        failure {
-             script {
-                 slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
-           }
-        }
+    //     failure {
+    //         script {
+    //             slackSend botUser: true, color: 'danger', message: "Failure :jenkins-${JOB_NAME}-${BUILD_ID}", teamDomain: 'DEVOPS TEAM', tokenCredentialId: 'slack-bot-token'
+    //         }
+    //     }
     //     // ..
         
     //     failure {
@@ -188,4 +186,4 @@ agent any
     //     // ..
     // }
 }
-}
+
