@@ -124,20 +124,11 @@ agent any
         stage('Staging deployment') {
             steps {
                 script {
-                    sh '''
-                    curl -i -i 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
-                    if curl -i 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
-                        echo "La chaîne 'toto' a été trouvée dans la réponse."
-                    else
-                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
-                    fi'''
-                    def code_retour = sh(script: 'curl -i -H "accept: application/json" https://www.devops-youss.cloudns.ph/users/1 | grep -i "200"', returnStatus: true) 
-                    // def count_return = sh '''curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1 ''' 
-                    def count_return = sh(script: "curl 'GET' -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users/1", returnStdout: true).trim()
-                    
+                    def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
+                    echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
 
-                    if (code_retour == 200 ) {
-                        echo $count_return
+                    if ((endpointCountUsersStatus == '200')) {
+                        echo "Endpoint count on users is working fine"
                     } else {
                         error("Endpoint error on users, please check pipeline log to see which one failed")
                     }

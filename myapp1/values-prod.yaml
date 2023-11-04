@@ -11,3 +11,7 @@ storageClassName: stclassname-prod
 pvName: postgres-pv-prod
 
 clusterIssuerName: letsencrypt-prod
+
+
+hostIngress1: fastapi.devops-youss.cloudns.ph
+hostIngress2: prod-pgadmin.devops-youss.cloudns.ph
