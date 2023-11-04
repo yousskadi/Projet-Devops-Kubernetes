@@ -12,3 +12,6 @@ image:
 
 hostIngress1: www.devops-youss.cloudns.ph
 hostIngress2: pgadmin.devops-youss.cloudns.ph
+
+ingress-grafana: 
+      enabled: false
