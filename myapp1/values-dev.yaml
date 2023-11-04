@@ -11,4 +11,4 @@ storageClassName: stclassname-dev
 pvName: postgres-pv-dev
 
 ingress-grafana: 
-      enabled: true
+  enabled: true
