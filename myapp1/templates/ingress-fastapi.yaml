@@ -4,7 +4,7 @@ metadata:
   name: ingress-fastapi
   namespace: {{ .Values.namespace }}
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuerName }}
     # Ajoutez vos annotations ici
 spec:
   tls:
