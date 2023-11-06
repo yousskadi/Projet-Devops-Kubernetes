@@ -114,7 +114,7 @@ agent any
                     echo "Installation Projet Devops 2023"
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                     helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
-                        
+                    kubectl apply -f myapp1/clusterissuer-dev.yaml    
                     
                     '''
                 }
@@ -124,14 +124,14 @@ agent any
         stage('Staging deployment') {
             steps {
                 script {
-                    def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
-                    echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
-
-                    if ((endpointCountUsersStatus == '200')) {
-                        echo "Endpoint count on users is working fine"
-                    } else {
-                        error("Endpoint error on users, please check pipeline log to see which one failed")
-                    }
+                    sh '''
+                    curl -k -i 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                    if curl -k -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
+                        echo "La chaîne 'toto' a été trouvée dans la réponse."
+                    else
+                        echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
+                    fi'''
+                    
                 }
             }
         }
@@ -148,6 +148,7 @@ agent any
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml     
                     helm upgrade --install myapp-release-prod myapp1/ --values myapp1/values.yaml -f myapp1/values-prod.yaml -n prod --create-namespace
                     kubectl apply -f myapp1/ingress-grafana.yaml
+                    kubectl apply -f myapp1/clusterissuer-prod.yaml
                     '''
                 }
             }
