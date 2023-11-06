@@ -115,7 +115,7 @@ agent any
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" myapp1/values.yaml
                     helm upgrade --install myapp-release-dev myapp1/ --values myapp1/values.yaml -f myapp1/values-dev.yaml -n dev --create-namespace
                     kubectl apply -f myapp1/clusterissuer-prod.yaml    
-                    
+                    sleep 10
                     '''
                 }
             }           
@@ -125,8 +125,8 @@ agent any
             steps {
                 script {
                     sh '''
-                    curl -i -X 'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
-                    if curl -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
+                    curl -k -i -X  'POST' -H 'Content-Type: application/json' -d '{"id": 1, "name": "toto", "email": "toto@email.com","password": "passwordtoto"}' https://www.devops-youss.cloudns.ph
+                    if curl -k -i -H 'accept: application/json' https://www.devops-youss.cloudns.ph/users | grep -qF "toto"; then
                         echo "La chaîne 'toto' a été trouvée dans la réponse."
                     else
                         echo "La chaîne 'toto' n'a pas été trouvée dans la réponse."
