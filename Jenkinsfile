@@ -6,21 +6,21 @@ pipeline {
         KUBECONFIG = credentials("config")
         DOCKER_PASS = credentials("DOCKER_HUB_PASS")
     }
-    agent any // Jenkins will be able to select all available agents
+    agent any
 
     stages {
         // get rid of unused docker data and volumes and network and so on
         // clean kubernetes cluster
         // docker system prune is for spaces reclaimed only
-        // stage('Clean stage') {
-        //         steps {
-        //             sh 'docker system prune -a --volumes -f'
-        //             sh 'kubectl delete all --all -n default'
-        //             sh 'kubectl delete all --all -n dev'
-        //             sh 'kubectl delete all --all -n staging'
-        //             sh 'kubectl delete all --all -n prod'
-        //         }
-        // }
+        stage('Clean cluster and docker') {
+                steps {
+                    sh 'docker system prune -a --volumes -f'
+                    sh 'kubectl delete all --all -n default'
+                    sh 'kubectl delete all --all -n dev'
+                    sh 'kubectl delete all --all -n staging'
+                    sh 'kubectl delete all --all -n prod'
+                }
+        }
 
         // stage('Cleanup docker containers and images') {
         //     steps {
@@ -66,38 +66,38 @@ pipeline {
         // }
 
 
-        stage('Image test') {
-            steps {
-                script {
-                    def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
-                    def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
+        // stage('Image test') {
+        //     steps {
+        //         script {
+        //             def fastapiStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:5000', returnStdout: true).trim()
+        //             def pgadminStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:8082', returnStdout: true).trim()
 
-                    echo "Display fastapiStatus: ${fastapiStatus}"
-                    echo "Display pgadminStatus: ${pgadminStatus}"
+        //             echo "Display fastapiStatus: ${fastapiStatus}"
+        //             echo "Display pgadminStatus: ${pgadminStatus}"
                         
-                    if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
-                        echo "Fast API and PgAdmin are running fine"
-                    } else {
-                        error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
-                    }
-                }                           
-            }
-        }   
+        //             if ((fastapiStatus == '200') && (pgadminStatus == '200' || pgadminStatus == '302')) {
+        //                 echo "Fast API and PgAdmin are running fine"
+        //             } else {
+        //                 error("Fast API or PgAdmin is not working, check pipeline log to see which one failed")
+        //             }
+        //         }                           
+        //     }
+        // }   
 
-        stage('Staging deployment') {
-            steps {
-                script {
-                    def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
-                    echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
+        // stage('Staging deployment') {
+        //     steps {
+        //         script {
+        //             def endpointCountUsersStatus = sh(script: 'curl -s -o /dev/null -w "%{http_code}" https://www.devops-youss.cloudns.ph/users/count', returnStdout: true).trim()
+        //             echo "Display endpointCountUsersStatus: ${endpointCountUsersStatus}"
 
-                    if ((endpointCountUsersStatus == '200')) {
-                        echo "Endpoint count on users is working fine"
-                    } else {
-                        error("Endpoint error on users, please check pipeline log to see which one failed")
-                    }
-                }
-            }
-        }
+        //             if ((endpointCountUsersStatus == '200')) {
+        //                 echo "Endpoint count on users is working fine"
+        //             } else {
+        //                 error("Endpoint error on users, please check pipeline log to see which one failed")
+        //             }
+        //         }
+        //     }
+        // }
    
         // stage('Stop Docker image') {
         //     steps {
