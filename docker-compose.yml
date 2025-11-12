@@ -1,47 +1,126 @@
-version: '3.1'
+version: '3.8'
+
+# ⚠️ SECURITY IMPROVEMENTS:
+# - Uses environment variables from .env file
+# - Enables PostgreSQL authentication
+# - Adds healthchecks for all services
+# - Configures proper restart policies
+# - Uses non-root user in FastAPI container
+
 services:
 
   db:
-    image: postgres:12.0-alpine
+    image: postgres:15-alpine  # ⚠️ Updated to PostgreSQL 15 (more recent and secure)
     container_name: db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=storedb
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    expose: 
-      - 5432
+      # ⚠️ SECURITY: Use environment variables from .env file
+      # Never hardcode passwords in docker-compose.yml
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${POSTGRES_DB:-storedb}
+      # ⚠️ SECURITY: Remove POSTGRES_HOST_AUTH_METHOD=trust (enables authentication)
+      # Authentication is now required for all connections
+    ports:
+      - "5432:5432"  # Exposed for local access (remove in production)
     networks:
       - apinetwork
+    healthcheck:
+      # ⚠️ HEALTHCHECK: Verify PostgreSQL is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-storedb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    # ⚠️ SECURITY: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
 
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4
-    restart: always
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
+      # ⚠️ SECURITY: Use environment variables from .env file
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
     ports:
       - "8082:80"
     networks:
       - apinetwork
+    depends_on:
+      db:
+        condition: service_healthy  # Wait for DB to be healthy
+    healthcheck:
+      # ⚠️ HEALTHCHECK: Verify pgAdmin is responding
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   fastapi:
-    restart: always
+    restart: unless-stopped
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - 5000:5000
+      - "5000:5000"
+    environment:
+      # ⚠️ SECURITY: Pass database credentials via environment variables
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB:-storedb}
+      - DB_USER=${POSTGRES_USER:-admin}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - API_HOST=0.0.0.0
+      - API_PORT=5000
+      - ENVIRONMENT=development
+      - DEBUG=${DEBUG:-false}
+      # ⚠️ SECURITY: CORS origins (use specific origins in production)
+      - CORS_ORIGINS=*
     depends_on:
-      - db
+      db:
+        condition: service_healthy  # Wait for DB to be healthy
     networks:
       - apinetwork
+    healthcheck:
+      # ⚠️ HEALTHCHECK: Verify FastAPI is responding
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
 
 volumes:
   postgres_data:
+    driver: local
 
 networks:
   apinetwork:

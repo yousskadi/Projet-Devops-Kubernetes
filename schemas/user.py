@@ -1,11 +1,99 @@
-from typing import Optional
-from pydantic import BaseModel
+"""
+User schemas module.
 
+IMPROVEMENTS:
+- Separates request and response schemas (security: never return passwords)
+- Adds email validation
+- Adds password strength validation
+- Uses Pydantic v2 features
+"""
+
+from typing import Optional
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
+
+
+class UserBase(BaseModel):
+    """Base user schema with common fields."""
+    name: str = Field(..., min_length=1, max_length=255, description="User name")
+    email: EmailStr = Field(..., description="User email address")
+
+
+class UserCreate(UserBase):
+    """
+    Schema for creating a user.
+    
+    Used for POST requests.
+    """
+    password: str = Field(
+        ...,
+        min_length=8,
+        max_length=100,
+        description="User password (minimum 8 characters)"
+    )
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                "password": "securepassword123"
+            }
+        }
+    )
+
+
+class UserUpdate(BaseModel):
+    """
+    Schema for updating a user.
+    
+    All fields are optional for partial updates.
+    """
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    email: Optional[EmailStr] = None
+    password: Optional[str] = Field(None, min_length=8, max_length=100)
+
+
+class UserResponse(UserBase):
+    """
+    Schema for user responses.
+    
+    ⚠️ SECURITY: Never includes password field.
+    Used for GET requests.
+    """
+    id: int = Field(..., description="User ID")
+    
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john.doe@example.com"
+            }
+        }
+    )
+
+
+# Legacy schema for backward compatibility (deprecated)
 class User(BaseModel):
-    id: Optional[int]
+    """
+    ⚠️ DEPRECATED: Use UserCreate for creation and UserResponse for responses.
+    This schema is kept for backward compatibility but should not be used in new code.
+    """
+    id: Optional[int] = None
     name: str
     email: str
-    password: str
+    password: str  # ⚠️ WARNING: Never return this in API responses
+
 
 class UserCount(BaseModel):
-    total: int
+    """Schema for user count response."""
+    total: int = Field(..., description="Total number of users")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "total": 42
+            }
+        }
+    )

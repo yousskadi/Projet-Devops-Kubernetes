@@ -1,0 +1,93 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.fastapiName }}-network-policy
+  namespace: {{ .Values.namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.fastapiName }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from Ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow traffic from same namespace
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .Values.fastapiName }}
+      ports:
+        - protocol: TCP
+          port: 5000
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow traffic to PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: db
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow traffic to external services (for monitoring, etc.)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-prometheus-stack
+      ports:
+        - protocol: TCP
+          port: 9090
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-network-policy
+  namespace: {{ .Values.namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: db
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from FastAPI
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .Values.fastapiName }}
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow traffic from pgAdmin
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .Values.appName }}
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow all egress (PostgreSQL may need to connect to external services)
+    - {}
+
