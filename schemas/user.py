@@ -31,6 +31,7 @@ class UserCreate(UserBase):
         description="User password (minimum 8 characters)"
     )
     
+    # Pydantic v2 configuration
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -62,6 +63,7 @@ class UserResponse(UserBase):
     """
     id: int = Field(..., description="User ID")
     
+    # Pydantic v2 configuration
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
@@ -90,6 +92,7 @@ class UserCount(BaseModel):
     """Schema for user count response."""
     total: int = Field(..., description="Total number of users")
     
+    # Pydantic v2 configuration
     model_config = ConfigDict(
         json_schema_extra={
             "example": {

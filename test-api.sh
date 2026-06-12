@@ -81,38 +81,57 @@ echo "2. Test root endpoint..."
 test_endpoint "Root" "GET" "$API_URL/"
 echo ""
 
+
 # Test 3: Création d'utilisateur
 echo "3. Test création d'utilisateur..."
-USER_DATA='{
-    "name": "Test User",
-    "email": "test@example.com",
+
+# Générer un email unique pour éviter les conflits
+TIMESTAMP=$(date +%s)
+USER_EMAIL="test${TIMESTAMP}@example.com"
+
+USER_DATA=$(cat <<EOF
+{
+    "name": "User${TIMESTAMP}",
+    "email": "${USER_EMAIL}",
     "password": "testpassword123"
-}'
+}
+EOF
+)
+
+# Envoyer la requête POST
 USER_RESPONSE=$(curl -s -X POST "$API_URL/users/" \
     -H "Content-Type: application/json" \
     -d "$USER_DATA")
+
 USER_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API_URL/users/" \
     -H "Content-Type: application/json" \
     -d "$USER_DATA")
 
+# Gérer la réponse
 if [ "$USER_HTTP_CODE" -ge 200 ] && [ "$USER_HTTP_CODE" -lt 300 ]; then
     echo -e "${GREEN}✅ OK (HTTP $USER_HTTP_CODE)${NC}"
-    if command -v jq &> /dev/null; then
-        echo "$USER_RESPONSE" | jq '.' 2>/dev/null || echo "$USER_RESPONSE"
-        USER_ID=$(echo "$USER_RESPONSE" | jq -r '.id' 2>/dev/null)
-    else
-        echo "$USER_RESPONSE"
-        USER_ID=$(echo "$USER_RESPONSE" | grep -o '"id":[0-9]*' | grep -o '[0-9]*' | head -1)
-    fi
-    if [ -z "$USER_ID" ] || [ "$USER_ID" = "null" ]; then
-        USER_ID=1  # Fallback
-    fi
+elif [ "$USER_HTTP_CODE" -eq 409 ]; then
+    echo -e "${YELLOW}⚠️ Utilisateur existe déjà (HTTP 409)${NC}"
 else
     echo -e "${RED}❌ FAILED (HTTP $USER_HTTP_CODE)${NC}"
     echo "$USER_RESPONSE"
-    USER_ID=1  # Fallback pour continuer les tests
 fi
+
+# Récupérer l'ID de l'utilisateur pour les tests suivants
+if command -v jq &> /dev/null; then
+    USER_ID=$(echo "$USER_RESPONSE" | jq -r '.id' 2>/dev/null)
+else
+    USER_ID=$(echo "$USER_RESPONSE" | grep -o '"id":[0-9]*' | grep -o '[0-9]*' | head -1)
+fi
+
+# Fallback si l'ID est vide
+if [ -z "$USER_ID" ] || [ "$USER_ID" = "null" ]; then
+    USER_ID=1
+fi
+
+echo "Utilisateur ID utilisé pour tests suivants: $USER_ID"
 echo ""
+
 
 # Test 4: Récupération des utilisateurs
 echo "4. Test récupération des utilisateurs..."
