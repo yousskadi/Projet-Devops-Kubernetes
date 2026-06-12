@@ -45,6 +45,8 @@ ignore = [
 
 [tool.mypy]
 python_version = "3.11"
+# alembic/env.py est un fichier généré ; le dossier local "alembic/" masque le vrai package
+exclude = ["alembic/"]
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
