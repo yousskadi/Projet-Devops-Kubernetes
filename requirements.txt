@@ -1,23 +1,46 @@
-appdirs==1.4.4
-asgiref==3.4.1
-black==21.6b0
-certifi==2021.5.30
-cffi==1.14.6
-click==8.0.1
-cryptography==39.0.1
-et-xmlfile==1.1.0
-fastapi==0.66.0
-greenlet==1.1.0
-h11==0.12.0
-mypy-extensions==0.4.3
-openpyxl==3.0.7
-pathspec==0.8.1
-pycparser==2.20
-pydantic==1.8.2
-PyMySQL==1.0.2
-regex==2021.7.6
-SQLAlchemy==1.4.20
-toml==0.10.2
-typing-extensions==3.10.0.0
-uvicorn==0.14.0
-psycopg2-binary==2.8.4
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.3.0
+
+
+# Database
+SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.12.1  # Database migrations
+
+# Security
+bcrypt==4.1.1  # Password hashing (replaces Fernet for passwords)
+python-jose[cryptography]==3.3.0  # JWT tokens
+passlib[bcrypt]==1.7.4  # Password hashing utilities
+python-dotenv==1.0.0  # Environment variables
+
+# HTTP client for testing
+httpx==0.25.2
+
+# Development tools
+black==23.11.0
+ruff==0.1.6  # Fast Python linter
+mypy==1.7.1
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# Observability (optional, for Phase 3)
+prometheus-client==0.19.0
+prometheus-fastapi-instrumentator==6.1.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+opentelemetry-instrumentation-sqlalchemy==0.42b0
+opentelemetry-exporter-prometheus==1.12.0rc1
+
+# Removed unused dependencies:
+# - openpyxl (not used)
+# - PyMySQL (using PostgreSQL)
+# - cryptography (included in python-jose)
+# - et-xmlfile (dependency of openpyxl)
+# - appdirs, asgiref, cffi, click, certifi, greenlet, h11, mypy-extensions, pathspec, pycparser, regex, toml, typing-extensions (dependencies of other packages)

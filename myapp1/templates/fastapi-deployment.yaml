@@ -6,22 +6,87 @@ metadata:
   name: {{ .Values.fastapiName }}
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas | default 2 }}
   selector:
     matchLabels:
       app: {{ .Values.fastapiName }}
-  strategy: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: {{ .Values.fastapiName }}
+        version: {{ .Values.image.tag | default "latest" }}
     spec:
+      # ⚠️ SECURITY: Security context for non-root user
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - image: "{{ .Values.image.name }}:{{ .Values.image.tag }}" 
           name: {{ .Values.fastapiName }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           ports:
-            - containerPort: 5000
+            - name: http
+              containerPort: 5000
               protocol: TCP
-          resources: {}
+          # ⚠️ ENVIRONMENT: Load configuration from ConfigMap and Secrets
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.fastapiName }}-config
+            - secretRef:
+                name: {{ .Values.fastapiName }}-secrets
+          env:
+            - name: DB_HOST
+              value: "db"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.fastapiName }}-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.fastapiName }}-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-fastapi-userpass
+                  key: password
+          # ⚠️ HEALTHCHECKS: Liveness and readiness probes
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          # ⚠️ RESOURCES: Resource limits and requests
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "100m" }}
+              memory: {{ .Values.resources.requests.memory | default "256Mi" }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | default "500m" }}
+              memory: {{ .Values.resources.limits.memory | default "512Mi" }}
+      # ⚠️ SECURITY: Service account (for IRSA if using AWS)
+      serviceAccountName: {{ .Values.serviceAccount.name | default "default" }}
       restartPolicy: Always
-status: {}

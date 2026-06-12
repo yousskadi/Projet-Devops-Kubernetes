@@ -1,68 +1,209 @@
-from fastapi import APIRouter
-from config.db import conn
+"""
+User routes module.
+
+IMPROVEMENTS:
+- Uses bcrypt for password hashing (secure, one-way hashing)
+- Implements proper error handling with HTTPException
+- Uses dependency injection for database sessions
+- Validates email format
+- Proper HTTP status codes
+- Input validation and sanitization
+"""
+
+import re
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from passlib.context import CryptContext
+from sqlalchemy import func, insert, select
+from sqlalchemy.orm import Session
+
+from config.db import get_db
 from models.user import users
-from schemas.user import User, UserCount
-from typing import List
-from starlette.status import HTTP_204_NO_CONTENT
-from sqlalchemy import func, select
+from schemas.user import UserCount, UserCreate, UserResponse
 
-from cryptography.fernet import Fernet
+# ⚠️ SECURITY: Use bcrypt for password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-user = APIRouter()
-key = Fernet.generate_key()
-f = Fernet(key)
 
-@user.get("/")
-def root():
-    return {"message": "Congratulations ! It works ! You should try to take a look at the pgadmin panel on port 8080"}
-    
-@user.get(
-    "/users",
-    tags=["users"],
-    response_model=List[User],
-    description="Get a list of all users",
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bool(pwd_context.verify(plain_password, hashed_password))
+
+
+def get_password_hash(password: str) -> str:
+    return str(pwd_context.hash(password))
+
+
+def validate_email(email: str) -> bool:
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return re.match(pattern, email) is not None
+
+
+user = APIRouter(prefix="/users", tags=["users"])
+
+
+@user.get("/", response_model=list[UserResponse], description="Get a list of all users")
+def get_users(db: Session = Depends(get_db)):
+    try:
+        result = db.execute(select(users)).all()
+        users_list = []
+        for row in result:
+            user_dict = dict(row._mapping)
+            user_dict.pop("password", None)
+            users_list.append(user_dict)
+        return users_list
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching users: {str(e)}",
+        ) from e
+
+
+@user.get("/count", response_model=UserCount, description="Get the total number of users")
+def get_users_count(db: Session = Depends(get_db)):
+    try:
+        count = db.execute(select(func.count()).select_from(users)).scalar()
+        return {"total": count}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error counting users: {str(e)}",
+        ) from e
+
+
+@user.get("/{user_id}", response_model=UserResponse, description="Get a single user by ID")
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        result = db.execute(select(users).where(users.c.id == user_id)).first()
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found"
+            )
+        user_dict = dict(result._mapping)
+        user_dict.pop("password", None)
+        return user_dict
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching user: {str(e)}",
+        ) from e
+
+
+@user.post(
+    "/",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    description="Create a new user",
 )
-def get_users():
-    return conn.execute(users.select()).fetchall()
+def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
+    try:
+        if not validate_email(user_data.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email format"
+            )
+
+        existing_user = db.execute(select(users).where(users.c.email == user_data.email)).first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User with email {user_data.email} already exists",
+            )
+
+        hashed_password = get_password_hash(user_data.password)
+        new_user = {"name": user_data.name, "email": user_data.email, "password": hashed_password}
+
+        stmt = insert(users).values(new_user).returning(users.c.id)
+        result = db.execute(stmt)
+        user_id = result.scalar()
+        db.commit()
+
+        created_user = db.execute(select(users).where(users.c.id == user_id)).first()
+        if created_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="User creation failed",
+            )
+        user_dict = dict(created_user._mapping)
+        user_dict.pop("password", None)
+        return user_dict
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating user: {str(e)}",
+        ) from e
 
 
-@user.get("/users/count", tags=["users"], response_model=UserCount)
-def get_users_count():
-    result = conn.execute(select([func.count()]).select_from(users))
-    return {"total": tuple(result)[0][0]}
+@user.put("/{user_id}", response_model=UserResponse, description="Update a user by ID")
+def update_user(user_id: int, user_data: UserCreate, db: Session = Depends(get_db)):
+    try:
+        if not validate_email(user_data.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email format"
+            )
+
+        existing_user = db.execute(select(users).where(users.c.id == user_id)).first()
+        if not existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found"
+            )
+
+        email_user = db.execute(select(users).where(users.c.email == user_data.email)).first()
+        if email_user and dict(email_user._mapping).get("id") != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User with email {user_data.email} already exists",
+            )
+
+        hashed_password = get_password_hash(user_data.password)
+        db.execute(
+            users.update()
+            .where(users.c.id == user_id)
+            .values(name=user_data.name, email=user_data.email, password=hashed_password)
+        )
+        db.commit()
+
+        updated_user = db.execute(select(users).where(users.c.id == user_id)).first()
+        if updated_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="User update failed",
+            )
+        user_dict = dict(updated_user._mapping)
+        user_dict.pop("password", None)
+        return user_dict
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating user: {str(e)}",
+        ) from e
 
 
-@user.get(
-    "/users/{id}",
-    tags=["users"],
-    response_model=User,
-    description="Get a single user by Id",
+@user.delete(
+    "/{user_id}", status_code=status.HTTP_204_NO_CONTENT, description="Delete a user by ID"
 )
-def get_user(id: str):
-    return conn.execute(users.select().where(users.c.id == id)).first()
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        existing_user = db.execute(select(users).where(users.c.id == user_id)).first()
+        if not existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found"
+            )
 
+        db.execute(users.delete().where(users.c.id == user_id))
+        db.commit()
+        return None
 
-@user.post("/", tags=["users"], response_model=User, description="Create a new user")
-def create_user(user: User):
-    new_user = {"name": user.name, "email": user.email}
-    new_user["password"] = f.encrypt(user.password.encode("utf-8"))
-    result = conn.execute(users.insert().values(new_user))
-    return conn.execute(users.select().where(users.c.id == result.lastrowid)).first()
-
-
-@user.put(
-    "users/{id}", tags=["users"], response_model=User, description="Update a User by Id"
-)
-def update_user(user: User, id: int):
-    conn.execute(
-        users.update()
-        .values(name=user.name, email=user.email, password=user.password)
-        .where(users.c.id == id)
-    )
-    return conn.execute(users.select().where(users.c.id == id)).first()
-
-
-@user.delete("/{id}", tags=["users"], status_code=HTTP_204_NO_CONTENT)
-def delete_user(id: int):
-    conn.execute(users.delete().where(users.c.id == id))
-    return conn.execute(users.select().where(users.c.id == id)).first()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting user: {str(e)}",
+        ) from e

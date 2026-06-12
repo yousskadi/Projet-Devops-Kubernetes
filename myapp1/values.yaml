@@ -1,3 +1,6 @@
+# Default values for myapp1
+# This is a YAML-formatted file.
+
 appName: pgadmin-default
 
 fastapiName: fastapi
@@ -6,16 +9,69 @@ fastapiNodeport: fastapinodeport
 
 namespace: default
 
+# Image configuration
 image:
   name: ykadi/datascientestapi
-  tag: ""
+  tag: "latest"
+  pullPolicy: IfNotPresent
 
-#hostIngress1: www.devops-youss.cloudns.ph
-#hostIngress2: pgadmin.devops-youss.cloudns.ph
+# Replicas
+replicas: 2
 
+# Database configuration
+database:
+  name: storedb
+  user: admin
+  # ⚠️ SECURITY: never commit a password here — set via --set database.password=... (CI secret)
+  password: ""
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
 
+# Application resources
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
 
+# Environment configuration
+environment: production
+debug: "false"
+logLevel: INFO
 
+# CORS configuration
+corsOrigins: "*"  # In production, use specific origins
 
+# Secrets (should be overridden in values-prod.yaml or via External Secrets)
+secrets:
+  secretKey: "change-me-in-production"
+  jwtSecret: "change-me-in-production"
+
+# PGAdmin configuration
+pgadmin:
+  # ⚠️ SECURITY: never commit a password here — set via --set pgadmin.password=... (CI secret)
+  password: ""
+
+# Service account
+serviceAccount:
+  name: default
+
+# Ingress hosts
+# hostIngress1: www.devops-youss.cloudns.ph
+# hostIngress2: pgadmin.devops-youss.cloudns.ph
+
+# ClusterIssuer
 clusterIssuerNameProd: letsencrypt-prod
-#clusterIssuerNameDev: letsencrypt-dev
+# clusterIssuerNameDev: letsencrypt-dev
+
+# PVC configuration
+pvcName: postgres-pv-claim
+storageClassName: stclassname
+pvName: postgres-pv
