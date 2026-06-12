@@ -10,12 +10,13 @@ Tests cover:
 - Validation
 """
 
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import os
 
 # Set test environment variables
 os.environ["DB_HOST"] = "localhost"
@@ -25,7 +26,7 @@ os.environ["DB_USER"] = "test_user"
 os.environ["DB_PASSWORD"] = "test_password"
 
 from app import app
-from config.db import Base, get_db
+from config.db import get_db, meta
 
 # Create test database (in-memory SQLite for unit tests)
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -52,21 +53,17 @@ app.dependency_overrides[get_db] = override_get_db
 @pytest.fixture
 def client():
     """Create test client."""
-    # Create tables
-    Base.metadata.create_all(bind=engine)
+    # Create tables (the users table is declared on the Core `meta`, not on Base)
+    meta.create_all(bind=engine)
     yield TestClient(app)
     # Drop tables after tests
-    Base.metadata.drop_all(bind=engine)
+    meta.drop_all(bind=engine)
 
 
 @pytest.fixture
 def test_user():
     """Create a test user data."""
-    return {
-        "name": "Test User",
-        "email": "test@example.com",
-        "password": "testpassword123"
-    }
+    return {"name": "Test User", "email": "test@example.com", "password": "testpassword123"}
 
 
 def test_root_endpoint(client):
@@ -147,7 +144,7 @@ def test_update_user(client, test_user):
     updated_data = {
         "name": "Updated User",
         "email": "updated@example.com",
-        "password": "newpassword123"
+        "password": "newpassword123",
     }
     response = client.put(f"/users/{user_id}", json=updated_data)
     assert response.status_code == 200
@@ -179,4 +176,3 @@ def test_get_users_count(client, test_user):
     response = client.get("/users/count")
     assert response.status_code == 200
     assert response.json()["total"] >= 3
-

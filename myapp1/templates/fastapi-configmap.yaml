@@ -5,20 +5,19 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   # Database configuration
-  DB_NAME: {{ .Values.database.name | default "storedb" }}
-  DB_USER: {{ .Values.database.user | default "admin" }}
+  DB_NAME: {{ .Values.database.name | default "storedb" | quote }}
+  DB_USER: {{ .Values.database.user | default "admin" | quote }}
   DB_PORT: "5432"
   DB_HOST: "db"
-  
+
   # API configuration
   API_HOST: "0.0.0.0"
   API_PORT: "5000"
-  ENVIRONMENT: {{ .Values.environment | default "production" }}
-  DEBUG: {{ .Values.debug | default "false" }}
-  
-  # CORS configuration
-  CORS_ORIGINS: {{ .Values.corsOrigins | default "*" }}
-  
-  # Logging
-  LOG_LEVEL: {{ .Values.logLevel | default "INFO" }}
+  ENVIRONMENT: {{ .Values.environment | default "production" | quote }}
+  DEBUG: {{ .Values.debug | default "false" | quote }}
 
+  # CORS configuration
+  CORS_ORIGINS: {{ .Values.corsOrigins | default "*" | quote }}
+
+  # Logging
+  LOG_LEVEL: {{ .Values.logLevel | default "INFO" | quote }}

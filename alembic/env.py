@@ -4,13 +4,14 @@ Alembic environment configuration.
 This file is used by Alembic to generate and apply database migrations.
 """
 
-from logging.config import fileConfig
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from alembic import context
 import os
 import sys
+from logging.config import fileConfig
+
 from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
+
+from alembic import context
 
 # Load environment variables
 load_dotenv()
@@ -19,8 +20,7 @@ load_dotenv()
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import Base and models
-from config.db import Base, DATABASE_URL
-from models.user import users  # Import models to register them with Base
+from config.db import DATABASE_URL, Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

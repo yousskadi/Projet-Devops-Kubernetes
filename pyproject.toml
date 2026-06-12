@@ -39,6 +39,9 @@ ignore = [
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
+# E402: imports légitimes après code (config alembic, env vars de test)
+"alembic/env.py" = ["E402"]
+"tests/test_users.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.11"

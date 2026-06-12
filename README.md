@@ -201,15 +201,9 @@ Le workflow CI/CD inclut:
 2. **Test**: Exécution des tests unitaires
 3. **Security Scan**: Scan avec Trivy
 4. **Build**: Construction de l'image Docker
-5. **Deploy**: Déploiement sur EKS (dev/prod)
+5. **Deploy**: Déploiement sur EKS (dev/prod) + smoke tests bloquants
 
-### Jenkins
-
-Le Jenkinsfile existant peut être amélioré pour:
-- Utiliser des variables au lieu de chemins hardcodés
-- Ajouter des stages de test
-- Ajouter un scan de sécurité
-- Améliorer la gestion des erreurs
+Secrets GitHub requis pour le déploiement: `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `EKS_CLUSTER_NAME`, `DB_PASSWORD`, `PGADMIN_PASSWORD`.
 
 ## 📝 Migrations de Base de Données
 

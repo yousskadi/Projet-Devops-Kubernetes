@@ -9,11 +9,12 @@ SECURITY IMPROVEMENTS:
 """
 
 import os
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, declarative_base, Session
-from sqlalchemy.pool import QueuePool
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
+
+from sqlalchemy import MetaData, create_engine
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
+from sqlalchemy.pool import QueuePool
 
 # ⚠️ SECURITY: Load database credentials from environment variables
 # Never hardcode secrets in code. Use .env file for local development
@@ -55,12 +56,12 @@ meta = MetaData()
 def get_db() -> Generator[Session, None, None]:
     """
     FastAPI dependency for database sessions.
-    
+
     Usage in routes:
         def my_route(db: Session = Depends(get_db)):
             result = db.execute(...)
             db.commit()
-    
+
     Automatically handles session cleanup and rollback on errors.
     """
     db = SessionLocal()
@@ -79,12 +80,12 @@ def get_db() -> Generator[Session, None, None]:
 def get_db_context() -> Generator[Session, None, None]:
     """
     Context manager for database sessions (for non-FastAPI usage).
-    
+
     Usage:
         with get_db_context() as db:
             result = db.execute(...)
             db.commit()
-    
+
     Automatically handles session cleanup and rollback on errors.
     """
     db = SessionLocal()
@@ -96,8 +97,3 @@ def get_db_context() -> Generator[Session, None, None]:
         raise
     finally:
         db.close()
-
-
-# Legacy connection for backward compatibility (deprecated)
-# ⚠️ DEPRECATED: Use get_db() context manager instead
-conn = engine.connect()

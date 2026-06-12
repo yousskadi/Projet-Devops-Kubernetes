@@ -22,6 +22,8 @@ replicas: 2
 database:
   name: storedb
   user: admin
+  # ⚠️ SECURITY: never commit a password here — set via --set database.password=... (CI secret)
+  password: ""
   resources:
     requests:
       cpu: 200m
@@ -51,6 +53,11 @@ corsOrigins: "*"  # In production, use specific origins
 secrets:
   secretKey: "change-me-in-production"
   jwtSecret: "change-me-in-production"
+
+# PGAdmin configuration
+pgadmin:
+  # ⚠️ SECURITY: never commit a password here — set via --set pgadmin.password=... (CI secret)
+  password: ""
 
 # Service account
 serviceAccount:
