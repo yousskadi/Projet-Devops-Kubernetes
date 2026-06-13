@@ -12,8 +12,8 @@ IMPROVEMENTS:
 
 import re
 
+import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
-from passlib.context import CryptContext
 from sqlalchemy import func, insert, select
 from sqlalchemy.orm import Session
 
@@ -21,16 +21,13 @@ from config.db import get_db
 from models.user import users
 from schemas.user import UserCount, UserCreate, UserResponse
 
-# ⚠️ SECURITY: Use bcrypt for password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bool(pwd_context.verify(plain_password, hashed_password))
+    return bool(bcrypt.checkpw(plain_password.encode(), hashed_password.encode()))
 
 
 def get_password_hash(password: str) -> str:
-    return str(pwd_context.hash(password))
+    return str(bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode())
 
 
 def validate_email(email: str) -> bool:
